@@ -2,30 +2,26 @@ import { useEffect, useId, useState } from "react";
 import { Input } from "reactstrap";
 
 export interface Props {
-    onPickUser: (username: string) => void
+    value: string,
+    onChange: (e: string) => void,
+    userList?: string[]
 }
 
 const UserPicker = (props: Props) => {
 
     const userListId = useId();
 
-    const [users, _setUsers] = useState<string[]>([]);
-
-    // TODO: Implement API
-    useEffect(() => {
-    }, []);
-
-    const [search, setSearch] = useState<string>("");
-
-    const updateSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
-        setSearch(e.target.value.toLocaleLowerCase());
-    }
+    const [users, setUsers] = useState<string[]>([]);
 
     useEffect(() => {
-        if (users.includes(search)) {
-            props.onPickUser(search);
+        if (!props.userList) {
+            // TODO: Implement API
+        } else {
+            setUsers(props.userList);
         }
-    }, [search]);
+    }, [props.userList]);
+
+    const updateSearch = (e: React.ChangeEvent<HTMLInputElement>) => props.onChange(e.target.value)
 
     const getFilteredUsers = (query: string) => {
         if (!query) {
@@ -45,13 +41,13 @@ const UserPicker = (props: Props) => {
             <Input
                 type="text"
                 list={`userList-${userListId}`}
-                value={search}
+                value={props.value}
                 placeholder="Username"
                 onChange={updateSearch}
             />
 
             <datalist id={`userList-${userListId}`}>
-                {getFilteredUsers(search).map((u, i) => <option key={i} value={u} />)}
+                {getFilteredUsers(props.value).map((u, i) => <option key={i} value={u} />)}
             </datalist>
         </>
     )

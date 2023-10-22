@@ -5,13 +5,15 @@ import { ReactSortable } from "react-sortablejs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faCircleMinus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 
+interface QuoteEntry {
+    id: number,
+    quote: string,
+    username: string,
+}
+
 const SubmitQuote = () => {
 
-    interface QuoteEntry {
-        id: number,
-        quote: string,
-        username: string,
-    }
+    const [userList, _setUserList] = useState<string[]>([]);
 
     const [quoteEntries, setQuoteEntries] = useState<QuoteEntry[]>([
         {
@@ -50,8 +52,7 @@ const SubmitQuote = () => {
             }))
         );
 
-    const canSubmit = () => quoteEntries.filter(q => q.quote.length === 0).length === 0;
-
+    const canSubmit = () => quoteEntries.every(q => q.quote.length > 0 && userList.includes(q.username));
 
     // TODO implement API route
     const submit = () => { }
@@ -76,7 +77,7 @@ const SubmitQuote = () => {
                                     value={q.quote}
                                     onChange={e => changeQuoteText(q.id, e.target.value)}
                                 />
-                                <UserPicker onPickUser={e => changeQuoteUsername(q.id, e)} />
+                                <UserPicker value={q.username} onChange={e => changeQuoteUsername(q.id, e)} userList={userList} />
                             </Col>
                             <Col className="col-1 d-flex align-items-center">
                                 <Button className="shadow-none" onClick={_ => deleteQuoteEntry(q)} disabled={quoteEntries.length <= 1}>
