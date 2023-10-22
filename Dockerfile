@@ -5,10 +5,8 @@ ENV npm_config_cache /app/.npm
 RUN npm ci --silent
 RUN npm run build
 
-# Needed for OKD reasons
-RUN chown -R node:root /app
-RUN chmod -R 775 /app
-USER node
-
+FROM nginx:alpine as serve
+WORKDIR /app
+COPY --from=build /app/dist /app/
+COPY nginx.conf /etc/nginx
 EXPOSE 8080
-CMD npm run dev
