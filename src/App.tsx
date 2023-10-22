@@ -7,7 +7,7 @@ function App() {
     return (
         <Container className="main" fluid>
             <NavBar />
-            <Container>
+            <Container style={{ marginTop: "90px" }}>
                 <Home />
             </Container>
         </Container>
