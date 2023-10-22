@@ -1,4 +1,4 @@
-import { Container, Nav, NavItem, NavLink, Navbar } from "reactstrap";
+import { Container, NavLink, Navbar } from "reactstrap";
 
 const NavBar = () => {
     return (

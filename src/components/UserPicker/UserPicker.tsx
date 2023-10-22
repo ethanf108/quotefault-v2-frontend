@@ -9,7 +9,7 @@ const UserPicker = (props: Props) => {
 
     const userListId = useId();
 
-    const [users, setUsers] = useState<string[]>([]);
+    const [users, _setUsers] = useState<string[]>([]);
 
     // TODO: Implement API
     useEffect(() => {
