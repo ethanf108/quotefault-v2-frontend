@@ -1,20 +1,32 @@
 import { Button, Card, CardBody, CardFooter } from "reactstrap";
 import { Quote } from "../../API/Types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+import { faArrowUpRightFromSquare, faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
+import { isEboardOrRTP } from "../../util";
+import { useOidcUser } from "@axa-fr/react-oidc";
 
 interface Props {
     quote: Quote
 }
 
 const QuoteCard = (props: Props) => {
+
+    const { oidcUser } = useOidcUser();
+
     return (
         <Card className="mb-3">
             <CardBody>
                 <span className="float-left w-75">
                     {
                         props.quote.shards.map((s, i) =>
-                            <p key={i}>&quot;{s.body}&quot; - <a href="#" className="text-primary"><b>{s.speaker}</b></a></p>
+                            <p key={i}>
+                                &quot;{s.body}&quot; - &nbsp;
+                                <a href={`https://profiles.csh.rit.edu/user/${s.speaker}`} rel="noopener" target="_blank" className="text-primary">
+                                    <b>{s.speaker}</b>
+                                    &nbsp;
+                                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="fa-xs" />
+                                </a>
+                            </p>
                         )
                     }
                 </span>
@@ -28,7 +40,7 @@ const QuoteCard = (props: Props) => {
                 <p className="float-left">Submitted By <a className="text-primary"><b>{props.quote.submitter}</b></a> on {props.quote.timestamp.toLocaleString().replace(", ", " at ")}</p>
                 <span className="float-right">
                     <Button className="btn-danger float-right">Report</Button>
-                    <Button className="btn-warning mx-1 float-right">Hide</Button>
+                    {isEboardOrRTP(oidcUser) && <Button className="btn-warning mx-1 float-right">Hide</Button>}
                 </span>
             </CardFooter>
         </Card>

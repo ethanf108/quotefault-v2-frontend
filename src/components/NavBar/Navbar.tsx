@@ -2,9 +2,13 @@ import { Collapse, Container, Nav, NavItem, NavLink, Navbar, NavbarToggler } fro
 import Profile from "../Profile";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDatabase } from "@fortawesome/free-solid-svg-icons";
+import { faDatabase, faFlag, faWarning } from "@fortawesome/free-solid-svg-icons";
+import { useOidcUser } from "@axa-fr/react-oidc";
+import { isEboardOrRTP } from "../../util";
 
 const NavBar = () => {
+
+    const { oidcUser } = useOidcUser();
 
     const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -19,17 +23,35 @@ const NavBar = () => {
     return (
         <Navbar color="primary" dark expand="lg" fixed="top">
             <Container>
-                <NavLink to="/" className="navbar-brand" aria-hidden="true">Quotefault</NavLink>
+                <NavLink href="/" className="navbar-brand" aria-hidden="true">Quotefault</NavLink>
                 <NavbarToggler onClick={toggle} />
                 {profile("d-md-none")}
-                <Collapse isOpen={isOpen} navbar >
+                <Collapse isOpen={isOpen} navbar>
                     <Nav navbar>
                         <NavItem>
-                            <NavLink to="/">
+                            <NavLink href="/storage">
                                 <FontAwesomeIcon icon={faDatabase} className="mr-1" />
                                 Storage
                             </NavLink>
                         </NavItem>
+                        {
+                            isEboardOrRTP(oidcUser) &&
+                            <>
+                                <NavItem>
+                                    <NavLink href="/storage">
+                                        <FontAwesomeIcon icon={faWarning} className="mr-1" />
+                                        Hidden
+                                    </NavLink>
+                                </NavItem>
+
+                                <NavItem>
+                                    <NavLink href="/storage">
+                                        <FontAwesomeIcon icon={faFlag} className="mr-1" />
+                                        Reports
+                                    </NavLink>
+                                </NavItem>
+                            </>
+                        }
                     </Nav>
                 </Collapse>
                 {profile("d-none d-md-inline")}

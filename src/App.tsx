@@ -1,6 +1,8 @@
 import { Container } from "reactstrap"
 import Home from "./pages/Home"
 import NavBar from "./components/NavBar"
+import { BrowserRouter, Route, Routes } from "react-router-dom"
+import Storage from "./pages/Storage"
 
 function App() {
 
@@ -8,7 +10,12 @@ function App() {
         <Container className="main" fluid>
             <NavBar />
             <Container style={{ marginTop: "90px" }}>
-                <Home />
+                <BrowserRouter>
+                    <Routes>
+                        <Route path="/" element={<Home />} />
+                        <Route path="/storage" element={<Storage />} />
+                    </Routes>
+                </BrowserRouter>
             </Container>
         </Container>
     )
