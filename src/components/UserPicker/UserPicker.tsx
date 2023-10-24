@@ -1,17 +1,18 @@
 import { useEffect, useId, useState } from "react";
 import { Input } from "reactstrap";
+import { CSHUser } from "../../API/Types";
 
 export interface Props {
     value: string,
     onChange: (e: string) => void,
-    userList?: string[]
+    userList?: CSHUser[]
 }
 
 const UserPicker = (props: Props) => {
 
     const userListId = useId();
 
-    const [users, setUsers] = useState<string[]>([]);
+    const [users, setUsers] = useState<CSHUser[]>([]);
 
     useEffect(() => {
         if (!props.userList) {
@@ -28,11 +29,12 @@ const UserPicker = (props: Props) => {
             return [];
         }
 
-        const filteredUsers = users.filter(u => u.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
-        if (filteredUsers.length <= 1 && filteredUsers[0] === query) {
+        const filteredUsers = users.filter(u => u.uid.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+            || u.cn.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+        if (filteredUsers.length <= 1 && filteredUsers[0].uid === query) {
             return [];
         } else {
-            return filteredUsers.sort((a, b) => a.localeCompare(b)).slice(0, 10);
+            return filteredUsers.sort((a, b) => a.cn.localeCompare(b.cn)).slice(0, 10);
         }
     }
 
@@ -47,7 +49,7 @@ const UserPicker = (props: Props) => {
             />
 
             <datalist id={`userList-${userListId}`}>
-                {getFilteredUsers(props.value).map((u, i) => <option key={i} value={u} />)}
+                {getFilteredUsers(props.value).map((u, i) => <option key={i} value={u.uid}>{u.cn}</option>)}
             </datalist>
         </>
     )

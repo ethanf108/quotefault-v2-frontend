@@ -4,30 +4,32 @@ import { useState } from "react";
 import { ReactSortable } from "react-sortablejs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faCircleMinus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import { useApi, useFetchArray } from "../../API/API";
+import { CSHUser, QuoteShard } from "../../API/Types";
 
-interface QuoteEntry {
+interface QuoteEntry extends QuoteShard {
     id: number,
-    quote: string,
-    username: string,
 }
 
 const SubmitQuote = () => {
 
-    const [userList, _setUserList] = useState<string[]>([]);
+    const { apiPost } = useApi();
+
+    const userList = useFetchArray<CSHUser>("/api/users");
 
     const [quoteEntries, setQuoteEntries] = useState<QuoteEntry[]>([
         {
             id: 0,
-            quote: "",
-            username: "",
+            body: "",
+            speaker: "",
         }
     ]);
 
     const addQuoteEntry = () =>
         setQuoteEntries([...quoteEntries, {
             id: quoteEntries.reduce((a, b) => a.id > b.id ? a : b).id + 1,
-            quote: "",
-            username: "",
+            body: "",
+            speaker: "",
         }]);
 
     const deleteQuoteEntry = (quote: QuoteEntry) =>
@@ -40,7 +42,7 @@ const SubmitQuote = () => {
         setQuoteEntries(
             quoteEntries.map(q => ({
                 ...q,
-                quote: q.id === id ? quote : q.quote
+                body: q.id === id ? quote : q.body
             }))
         )
 
@@ -48,14 +50,22 @@ const SubmitQuote = () => {
         setQuoteEntries(
             quoteEntries.map(q => ({
                 ...q,
-                username: q.id === id ? username : q.username
+                speaker: q.id === id ? username : q.speaker
             }))
         );
 
-    const canSubmit = () => quoteEntries.every(q => q.quote.length > 0 && userList.includes(q.username));
+    const canSubmit = () => quoteEntries.every(q => q.body.length > 0 && userList.map(u => u.uid).includes(q.speaker));
 
     // TODO implement API route
-    const submit = () => { }
+    const submit = () => {
+        apiPost("/api/quote", {
+            shards: quoteEntries.map(s => ({
+                body: s.body,
+                speaker: s.speaker,
+            }))
+        }).then(_ => console.log("G"))
+            .catch(e => console.warn(e))
+    }
 
     return (
         <Card>
@@ -74,10 +84,10 @@ const SubmitQuote = () => {
                                     className="mr-3"
                                     type="text"
                                     placeholder="Quote"
-                                    value={q.quote}
+                                    value={q.body}
                                     onChange={e => changeQuoteText(q.id, e.target.value)}
                                 />
-                                <UserPicker value={q.username} onChange={e => changeQuoteUsername(q.id, e)} userList={userList} />
+                                <UserPicker value={q.speaker} onChange={e => changeQuoteUsername(q.id, e)} userList={userList} />
                             </Col>
                             <Col className="col-1 d-flex align-items-center">
                                 <Button className="shadow-none" onClick={_ => deleteQuoteEntry(q)} disabled={quoteEntries.length <= 1}>
