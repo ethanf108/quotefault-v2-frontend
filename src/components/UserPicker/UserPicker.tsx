@@ -14,13 +14,7 @@ const UserPicker = (props: Props) => {
 
     const [users, setUsers] = useState<CSHUser[]>([]);
 
-    useEffect(() => {
-        if (!props.userList) {
-            // TODO: Implement API
-        } else {
-            setUsers(props.userList);
-        }
-    }, [props.userList]);
+    useEffect(() => setUsers(props.userList || []), [props.userList]);
 
     const updateSearch = (e: React.ChangeEvent<HTMLInputElement>) => props.onChange(e.target.value)
 
@@ -29,9 +23,11 @@ const UserPicker = (props: Props) => {
             return [];
         }
 
-        const filteredUsers = users.filter(u => u.uid.toLocaleLowerCase().includes(query.toLocaleLowerCase())
-            || u.cn.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
-        if (filteredUsers.length <= 1 && filteredUsers[0].uid === query) {
+        const filteredUsers =
+            users.filter(u => u.uid.toLocaleLowerCase().includes(query.toLocaleLowerCase())
+                || u.cn.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
+
+        if (filteredUsers.length <= 1 && filteredUsers[0]?.uid === query) {
             return [];
         } else {
             return filteredUsers.sort((a, b) => a.cn.localeCompare(b.cn)).slice(0, 10);

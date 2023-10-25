@@ -5,10 +5,13 @@ import { ReactSortable } from "react-sortablejs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faBars, faCircleMinus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
 import { useApi, useFetchArray } from "../../API/API";
-import { CSHUser, QuoteShard } from "../../API/Types";
+import { CSHUser } from "../../API/Types";
+import { toast } from "react-toastify";
 
-interface QuoteEntry extends QuoteShard {
+interface QuoteEntry {
     id: number,
+    speaker: string,
+    body: string,
 }
 
 const SubmitQuote = () => {
@@ -63,7 +66,17 @@ const SubmitQuote = () => {
                 body: s.body,
                 speaker: s.speaker,
             }))
-        }).then(_ => console.log("G"))
+        })
+            .then(_ => {
+                toast.success("Submitted Quote!", { theme: "colored" });
+                setQuoteEntries([
+                    {
+                        id: 0,
+                        body: "",
+                        speaker: "",
+                    }
+                ]);
+            })
             .catch(e => console.warn(e))
     }
 

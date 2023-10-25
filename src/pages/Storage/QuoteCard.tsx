@@ -1,5 +1,5 @@
 import { Button, Card, CardBody, CardFooter } from "reactstrap";
-import { Quote } from "../../API/Types";
+import { Quote, formatUser } from "../../API/Types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare, faCaretDown, faCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { isEboardOrRTP } from "../../util";
@@ -21,8 +21,8 @@ const QuoteCard = (props: Props) => {
                         props.quote.shards.map((s, i) =>
                             <p key={i}>
                                 &quot;{s.body}&quot; - &nbsp;
-                                <a href={`https://profiles.csh.rit.edu/user/${s.speaker}`} rel="noopener" target="_blank" className="text-primary">
-                                    <b>{s.speaker}</b>
+                                <a href={`https://profiles.csh.rit.edu/user/${s.speaker.uid}`} rel="noopener" target="_blank" className="text-primary">
+                                    <b>{formatUser(s.speaker)}</b>
                                     &nbsp;
                                     <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="fa-xs" />
                                 </a>
@@ -37,7 +37,7 @@ const QuoteCard = (props: Props) => {
                 </span>
             </CardBody>
             <CardFooter>
-                <p className="float-left">Submitted By <a className="text-primary"><b>{props.quote.submitter}</b></a> on {props.quote.timestamp.toLocaleString().replace(", ", " at ")}</p>
+                <p className="float-left">Submitted By <a className="text-primary"><b>{formatUser(props.quote.submitter)}</b></a> on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}</p>
                 <span className="float-right">
                     <Button className="btn-danger float-right">Report</Button>
                     {isEboardOrRTP(oidcUser) && <Button className="btn-warning mx-1 float-right">Hide</Button>}
