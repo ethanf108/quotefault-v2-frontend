@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, Col, Container, Input, Row } from "reactstrap";
+import { Button, Card, CardBody, Container, Input } from "reactstrap";
 import UserPicker from "../UserPicker";
 import { useState } from "react";
 import { ReactSortable } from "react-sortablejs";
@@ -85,45 +85,36 @@ const SubmitQuote = () => {
             <CardBody>
                 <ReactSortable list={quoteEntries} setList={setQuoteEntries}>
                     {quoteEntries.map((q, i) =>
-                        <Row key={i} className="drag-item cursor-move">
-                            <Col className="col-1  move-quote-handle d-flex align-items-center">
-                                {
-                                    quoteEntries.length > 1 &&
-                                    <FontAwesomeIcon icon={faBars} className="fa-lg flex-grow-1" />
-                                }
-                            </Col>
-                            <Col className="col-10 d-flex">
-                                <Input
-                                    className="mr-3"
-                                    type="text"
-                                    placeholder="Quote"
-                                    value={q.body}
-                                    onChange={e => changeQuoteText(q.id, e.target.value)}
+                        <div key={i} className="d-flex align-items-center">
+                            {
+                                quoteEntries.length > 1 &&
+                                <FontAwesomeIcon icon={faBars} className="fa-lg mr-4" />
+                            }
+                            <Input
+                                className="mr-3"
+                                type="text"
+                                placeholder="Quote"
+                                value={q.body}
+                                onChange={e => changeQuoteText(q.id, e.target.value)}
+                            />
+                            <UserPicker value={q.speaker} onChange={e => changeQuoteUsername(q.id, e)} userList={userList} />
+                            <Button className="shadow-none" onClick={_ => deleteQuoteEntry(q)} disabled={quoteEntries.length <= 1}>
+                                <FontAwesomeIcon
+                                    icon={faCircleMinus}
+                                    className={`${quoteEntries.length > 1 && "text-danger"} flex-grow-1`}
                                 />
-                                <UserPicker value={q.speaker} onChange={e => changeQuoteUsername(q.id, e)} userList={userList} />
-                            </Col>
-                            <Col className="col-1 d-flex align-items-center">
-                                <Button className="shadow-none" onClick={_ => deleteQuoteEntry(q)} disabled={quoteEntries.length <= 1}>
-                                    <FontAwesomeIcon
-                                        icon={faCircleMinus}
-                                        className={`${quoteEntries.length > 1 && "text-danger"} flex-grow-1`}
-                                    />
-                                </Button>
-                            </Col>
-
-                        </Row>
+                            </Button>
+                        </div>
                     )}
                 </ReactSortable>
-                <Row className="d-flex flex-row-reverse">
-                    <Col className="col-1">
-                        <Button className="float-ednd mt-2 shadow-none text-success" onClick={addQuoteEntry}><FontAwesomeIcon icon={faCirclePlus} /></Button>
-                    </Col>
-                </Row>
+                <div className="">
+                    <Button className="float-right mt-2 shadow-none text-success" onClick={addQuoteEntry}><FontAwesomeIcon icon={faCirclePlus} /></Button>
+                </div>
                 <Container className="d-flex px-0 pt-3">
                     <Button disabled={!canSubmit()} onClick={submit} size="sm" color="primary" className="flex-grow-1">Submit</Button>
                 </Container>
             </CardBody>
-        </Card>
+        </Card >
     )
 }
 

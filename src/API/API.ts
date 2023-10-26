@@ -93,7 +93,7 @@ const apiPostPutPatch = (fetch: FetchFunc, method: "POST" | "PUT" | "PATCH") => 
     }
     return fetch(baseURL + url, describe)
         .then(response => {
-            if (response.status !== 200) {
+            if (response.status >= 300) {
                 throw response;
             }
             return response;
@@ -126,10 +126,8 @@ const apiDelete = (fetch: FetchFunc) => (url: string, params?: any): Promise<Res
         });
 }
 
-export const toastError = (message: string) => (resp: any) => {
-    resp.json()
-        .then((error: any) =>
-            toast.error(`${message}: ${error.message}`, {
-                theme: "colored"
-            }))
+export const toastError = (message: string) => (err: any) => {
+    toast.error(`${message}: ${JSON.stringify(err)}`, {
+        theme: "colored"
+    });
 }
