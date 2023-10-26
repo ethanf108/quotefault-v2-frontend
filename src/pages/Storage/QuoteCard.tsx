@@ -37,7 +37,15 @@ const QuoteCard = (props: Props) => {
                 </span>
             </CardBody>
             <CardFooter>
-                <p className="float-left">Submitted By <a className="text-primary"><b>{formatUser(props.quote.submitter)}</b></a> on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}</p>
+                <p className="float-left">
+                    Submitted By &nbsp;
+                    <a href={`https://profiles.csh.rit.edu/user/${props.quote.submitter.uid}`} rel="noopener" target="_blank" className="text-primary">
+                        <b>{formatUser(props.quote.submitter)}</b>
+                        &nbsp;
+                        <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="fa-xs" />
+                    </a>
+                    &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
+                </p>
                 <span className="float-right">
                     <Button className="btn-danger float-right">Report</Button>
                     {isEboardOrRTP(oidcUser) && <Button className="btn-warning mx-1 float-right">Hide</Button>}
