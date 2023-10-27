@@ -1,14 +1,15 @@
-import { Button, Card, CardBody, CardFooter } from "reactstrap";
+import { Card, CardBody, CardFooter } from "reactstrap";
 import { Quote, formatUser } from "../../API/Types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare, faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { isEboardOrRTP } from "../../util";
 import { useOidcUser } from "@axa-fr/react-oidc";
 import { useEffect, useState } from "react";
+import ConfirmDialog from "../../components/ConfirmDialog";
 
 interface Props {
     quote: Quote,
-    onAction: (type: "HIDE" | "UNHIDE" | "REPORT" | "UPVOTE" | "DOWNVOTE" | "UNVOTE") => void
+    onAction: (type: "HIDE" | "UNHIDE" | "REPORT" | "UPVOTE" | "DOWNVOTE" | "UNVOTE" | "DELETE") => void
 }
 
 const QuoteCard = (props: Props) => {
@@ -18,6 +19,8 @@ const QuoteCard = (props: Props) => {
     const [vote, setVote] = useState<"UP" | "DOWN" | null>(null);
 
     useEffect(() => props.onAction(`${vote || "UN"}VOTE`), [vote]);
+
+    if (!oidcUser) return <></>;
 
     return (
         <Card className="mb-3">
@@ -59,8 +62,13 @@ const QuoteCard = (props: Props) => {
                     &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
                 </p>
                 <span className="float-right">
-                    <Button className="btn-danger float-right" onClick={() => props.onAction("REPORT")}>Report</Button>
-                    {isEboardOrRTP(oidcUser) && <Button className="btn-warning mx-1 float-right" onClick={() => props.onAction("HIDE")}>Hide</Button>}
+                    {oidcUser.preferred_username === props.quote.submitter.uid &&
+                        <ConfirmDialog onClick={() => props.onAction("DELETE")} buttonClassName="btn-danger">Delete</ConfirmDialog>}
+
+                    {(isEboardOrRTP(oidcUser) || oidcUser.preferred_username === props.quote.submitter.uid)
+                        && <ConfirmDialog onClick={() => props.onAction("HIDE")} buttonClassName="btn-warning mx-1">Hide</ConfirmDialog>}
+
+                    <ConfirmDialog onClick={() => props.onAction("REPORT")} buttonClassName="btn-danger">Report</ConfirmDialog>
                 </span>
             </CardFooter>
         </Card>
