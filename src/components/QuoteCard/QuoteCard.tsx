@@ -73,9 +73,9 @@ const QuoteCard = (props: Props) => {
                             <ConfirmDialog onClick={() => props.onAction("DELETE")} buttonClassName="btn-danger">Delete</ConfirmDialog>}
 
                         {canHide()
-                            && <ConfirmDialog onClick={() => props.onAction("HIDE")} buttonClassName="btn-warning mx-1">Hide</ConfirmDialog>}
+                            && <ConfirmDialog onClick={() => props.onAction("HIDE")} buttonClassName="btn-warning ml-1">Hide</ConfirmDialog>}
 
-                        <Button className="btn-danger" onClick={() => props.onAction("REPORT")}>Report</Button>
+                        <Button className="btn-danger ml-1" onClick={() => props.onAction("REPORT")}>Report</Button>
                     </span>
                 }
             </CardFooter>

@@ -57,14 +57,24 @@ const SubmitQuote = () => {
             }))
         );
 
-    const canSubmit = () => quoteEntries.every(q => q.body.length > 0 && userList.map(u => u.uid).includes(q.speaker));
+    const extractUsername = (q: QuoteEntry) => {
+        if (/^[a-zA-Z0-9]{2,32}$/.test(q.speaker)) {
+            return q.speaker;
+        } else if (/^.+\([a-zA-Z0-9]{2,32}\)$/.test(q.speaker)) {
+            return q.speaker.split(/\(|\)/)[1];
+        } else {
+            return "NONE!";
+        }
+    }
+
+    const canSubmit = () => quoteEntries.every(q => q.body.length > 0 && userList.map(u => u.uid.toLocaleLowerCase()).includes(extractUsername(q)));
 
     // TODO implement API route
     const submit = () => {
         apiPost("/api/quote", {
             shards: quoteEntries.map(s => ({
                 body: s.body,
-                speaker: s.speaker,
+                speaker: extractUsername(s),
             }))
         })
             .then(_ => {

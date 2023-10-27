@@ -23,15 +23,10 @@ const UserPicker = (props: Props) => {
             return [];
         }
 
-        const filteredUsers =
-            users.filter(u => u.uid.toLocaleLowerCase().includes(query.toLocaleLowerCase())
-                || u.cn.toLocaleLowerCase().includes(query.toLocaleLowerCase()));
-
-        if (filteredUsers.length <= 1 && filteredUsers[0]?.uid === query) {
-            return [];
-        } else {
-            return filteredUsers.sort((a, b) => a.cn.localeCompare(b.cn)).slice(0, 10);
-        }
+        return users
+            .filter(u => `${u.cn} ${u.uid}`.toLocaleLowerCase().includes(query.toLocaleLowerCase()))
+            .sort((a, b) => a.cn.localeCompare(b.cn))
+            .slice(0, 10);
     }
 
     return (
@@ -45,7 +40,7 @@ const UserPicker = (props: Props) => {
             />
 
             <datalist id={`userList-${userListId}`}>
-                {getFilteredUsers(props.value).map((u, i) => <option key={i} value={u.uid}>{u.cn}</option>)}
+                {getFilteredUsers(props.value).map((u, i) => <option key={i} value={`${u.cn} (${u.uid})`} />)}
             </datalist>
         </>
     )
