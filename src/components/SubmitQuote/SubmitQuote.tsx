@@ -83,12 +83,12 @@ const SubmitQuote = () => {
     return (
         <Card>
             <CardBody>
-                <ReactSortable list={quoteEntries} setList={setQuoteEntries}>
+                <ReactSortable list={quoteEntries} setList={setQuoteEntries} handle=".grab-drag" >
                     {quoteEntries.map((q, i) =>
                         <div key={i} className="d-flex align-items-center">
                             {
                                 quoteEntries.length > 1 &&
-                                <FontAwesomeIcon icon={faBars} className="fa-lg mr-4" />
+                                <FontAwesomeIcon icon={faBars} className="fa-lg mr-4 grab-drag" />
                             }
                             <Input
                                 className="mr-3"
