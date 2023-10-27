@@ -12,7 +12,7 @@ const pageSize = 5;
 
 const Storage = () => {
 
-    const { apiGet, apiDelete } = useApi();
+    const { apiGet, apiPut, apiDelete } = useApi();
 
     const [quotes, setQuotes] = useState<Quote[]>([]);
 
@@ -50,19 +50,25 @@ const Storage = () => {
         fetchQuotes();
     }
 
-    /*
     const updateQuote = (id: number) => () =>
         apiGet<Quote>(`/api/quote/${id}`)
             .then(q => setQuotes(quotes.map(o => o.id === q.id ? q : o)))
             .catch(toastError("Failed to update quote"));
-            */
+
 
     const dispatchAction = (quote: Quote) => (action: ActionType) => {
         switch (action) {
             case "DELETE": {
                 apiDelete(`/api/quote/${quote.id}`)
+                    .then(() => toast.success("Deleted Quote!", { theme: "colored" }))
                     .then(() => setQuotes(quotes.filter(q => q.id !== quote.id)))
                     .catch(toastError("Failed to delete quote"));
+                break;
+            }
+            case "HIDE": {
+                apiPut(`/api/quote/${quote.id}/hide`)
+                    .then(() => updateQuote(quote.id))
+                    .catch(toastError("Failed to hide quote"));
                 break;
             }
             default: {

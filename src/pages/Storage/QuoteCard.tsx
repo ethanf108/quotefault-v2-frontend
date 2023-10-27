@@ -22,6 +22,9 @@ const QuoteCard = (props: Props) => {
 
     useEffect(() => props.onAction(`${vote || "UN"}VOTE`), [vote]);
 
+    const canHide = () => isEboardOrRTP(oidcUser)
+        || props.quote.shards.map(s => s.speaker.uid).includes(oidcUser.preferred_username || "");
+
     if (!oidcUser) return <></>;
 
     return (
@@ -67,7 +70,7 @@ const QuoteCard = (props: Props) => {
                     {oidcUser.preferred_username === props.quote.submitter.uid &&
                         <ConfirmDialog onClick={() => props.onAction("DELETE")} buttonClassName="btn-danger">Delete</ConfirmDialog>}
 
-                    {(isEboardOrRTP(oidcUser) || oidcUser.preferred_username === props.quote.submitter.uid)
+                    {canHide()
                         && <ConfirmDialog onClick={() => props.onAction("HIDE")} buttonClassName="btn-warning mx-1">Hide</ConfirmDialog>}
 
                     <ConfirmDialog onClick={() => props.onAction("REPORT")} buttonClassName="btn-danger">Report</ConfirmDialog>
