@@ -107,9 +107,12 @@ const SubmitQuote = () => {
                         </div>
                     )}
                 </ReactSortable>
-                <div className="">
-                    <Button className="float-right mt-2 shadow-none text-success" onClick={addQuoteEntry}><FontAwesomeIcon icon={faCirclePlus} /></Button>
-                </div>
+                <Button
+                    className={`float-right mt-2 shadow-none ${quoteEntries.length < 6 && "text-success"}`}
+                    onClick={addQuoteEntry}
+                    disabled={quoteEntries.length >= 6}>
+                    <FontAwesomeIcon icon={faCirclePlus} />
+                </Button>
                 <Container className="d-flex px-0 pt-3">
                     <Button disabled={!canSubmit()} onClick={submit} size="sm" color="primary" className="flex-grow-1">Submit</Button>
                 </Container>
