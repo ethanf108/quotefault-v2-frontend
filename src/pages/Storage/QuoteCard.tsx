@@ -7,9 +7,11 @@ import { useOidcUser } from "@axa-fr/react-oidc";
 import { useEffect, useState } from "react";
 import ConfirmDialog from "../../components/ConfirmDialog";
 
+export type ActionType = "HIDE" | "UNHIDE" | "REPORT" | "UPVOTE" | "DOWNVOTE" | "UNVOTE" | "DELETE";
+
 interface Props {
     quote: Quote,
-    onAction: (type: "HIDE" | "UNHIDE" | "REPORT" | "UPVOTE" | "DOWNVOTE" | "UNVOTE" | "DELETE") => void
+    onAction: (type: ActionType) => void
 }
 
 const QuoteCard = (props: Props) => {
