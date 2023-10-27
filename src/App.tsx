@@ -5,6 +5,7 @@ import { BrowserRouter, Route, Routes } from "react-router-dom"
 import Storage from "./pages/Storage"
 import { ToastContainer } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
+import SubmitReport from "./pages/SubmitReport"
 
 function App() {
 
@@ -17,6 +18,7 @@ function App() {
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/storage" element={<Storage />} />
+                        <Route path="/report" element={<SubmitReport />} />
                     </Routes>
                 </Container>
             </Container>

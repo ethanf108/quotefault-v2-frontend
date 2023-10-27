@@ -1,12 +1,12 @@
 import { useEffect, useState } from "react";
 import { Quote } from "../../API/Types";
-import QuoteCard, { ActionType } from "./QuoteCard";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { toastError, useApi } from "../../API/API";
 import { Button, Card, CardBody, Container, Input } from "reactstrap";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { toast } from "react-toastify";
+import QuoteCard, { ActionType } from "../../components/QuoteCard/QuoteCard";
 
 const pageSize = 5;
 
@@ -69,6 +69,10 @@ const Storage = () => {
                 apiPut(`/api/quote/${quote.id}/hide`)
                     .then(() => updateQuote(quote.id))
                     .catch(toastError("Failed to hide quote"));
+                break;
+            }
+            case "REPORT": {
+                window.location.assign(`/report?id=${quote.id}`);
                 break;
             }
             default: {

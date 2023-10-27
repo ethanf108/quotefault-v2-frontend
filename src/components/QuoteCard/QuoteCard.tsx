@@ -1,4 +1,4 @@
-import { Card, CardBody, CardFooter } from "reactstrap";
+import { Button, Card, CardBody, CardFooter } from "reactstrap";
 import { Quote, formatUser } from "../../API/Types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare, faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp } from "@fortawesome/free-solid-svg-icons";
@@ -11,7 +11,8 @@ export type ActionType = "HIDE" | "UNHIDE" | "REPORT" | "UPVOTE" | "DOWNVOTE" | 
 
 interface Props {
     quote: Quote,
-    onAction: (type: ActionType) => void
+    onAction: (type: ActionType) => void,
+    readonly?: boolean
 }
 
 const QuoteCard = (props: Props) => {
@@ -66,15 +67,17 @@ const QuoteCard = (props: Props) => {
                     </a>
                     &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
                 </p>
-                <span className="float-right">
-                    {oidcUser.preferred_username === props.quote.submitter.uid &&
-                        <ConfirmDialog onClick={() => props.onAction("DELETE")} buttonClassName="btn-danger">Delete</ConfirmDialog>}
+                {!props.readonly &&
+                    <span className="float-right">
+                        {oidcUser.preferred_username === props.quote.submitter.uid &&
+                            <ConfirmDialog onClick={() => props.onAction("DELETE")} buttonClassName="btn-danger">Delete</ConfirmDialog>}
 
-                    {canHide()
-                        && <ConfirmDialog onClick={() => props.onAction("HIDE")} buttonClassName="btn-warning mx-1">Hide</ConfirmDialog>}
+                        {canHide()
+                            && <ConfirmDialog onClick={() => props.onAction("HIDE")} buttonClassName="btn-warning mx-1">Hide</ConfirmDialog>}
 
-                    <ConfirmDialog onClick={() => props.onAction("REPORT")} buttonClassName="btn-danger">Report</ConfirmDialog>
-                </span>
+                        <Button className="btn-danger" onClick={() => props.onAction("REPORT")}>Report</Button>
+                    </span>
+                }
             </CardFooter>
         </Card>
     )
