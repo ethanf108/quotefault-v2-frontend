@@ -9,7 +9,8 @@ export type ActionType = "UPVOTE" | "DOWNVOTE" | "UNVOTE";
 interface Props {
     quote: Quote,
     onAction: (type: ActionType) => void,
-    children?: ReactNode
+    children?: ReactNode,
+    hideVotes?: boolean
 }
 
 const QuoteCard = (props: Props) => {
@@ -35,17 +36,19 @@ const QuoteCard = (props: Props) => {
                         )
                     }
                 </span>
-                <span className="float-right ml-4 mr d-flex flex-column">
-                    <FontAwesomeIcon
-                        icon={vote === "UP" ? faSquareCaretUp : faCaretUp}
-                        onClick={() => setVote(vote === "UP" ? null : "UP")}
-                        className={`fa-3x ${vote === "UP" ? "text-success" : ""}`} />
-                    <h2 className="text-center my-0 mx-2">999</h2>
-                    <FontAwesomeIcon
-                        icon={vote === "DOWN" ? faSquareCaretDown : faCaretDown}
-                        onClick={() => setVote(vote === "DOWN" ? null : "DOWN")}
-                        className={`fa-3x dw-100 ${vote === "DOWN" ? "text-danger" : ""}`} />
-                </span>
+                {!props.hideVotes &&
+                    <span className="float-right ml-4 mr d-flex flex-column">
+                        <FontAwesomeIcon
+                            icon={vote === "UP" ? faSquareCaretUp : faCaretUp}
+                            onClick={() => setVote(vote === "UP" ? null : "UP")}
+                            className={`fa-3x ${vote === "UP" ? "text-success" : ""}`} />
+                        <h2 className="text-center my-0 mx-2">999</h2>
+                        <FontAwesomeIcon
+                            icon={vote === "DOWN" ? faSquareCaretDown : faCaretDown}
+                            onClick={() => setVote(vote === "DOWN" ? null : "DOWN")}
+                            className={`fa-3x dw-100 ${vote === "DOWN" ? "text-danger" : ""}`} />
+                    </span>
+                }
             </CardBody>
             <CardFooter>
                 <p className="float-left">
