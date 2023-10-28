@@ -1,32 +1,22 @@
-import { Button, Card, CardBody, CardFooter } from "reactstrap";
+import { Card, CardBody, CardFooter } from "reactstrap";
 import { Quote, formatUser } from "../../API/Types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare, faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp } from "@fortawesome/free-solid-svg-icons";
-import { isEboardOrRTP } from "../../util";
-import { useOidcUser } from "@axa-fr/react-oidc";
-import { useEffect, useState } from "react";
-import ConfirmDialog from "../../components/ConfirmDialog";
+import { ReactNode, useEffect, useState } from "react";
 
-export type ActionType = "HIDE" | "UNHIDE" | "REPORT" | "UPVOTE" | "DOWNVOTE" | "UNVOTE" | "DELETE";
+export type ActionType = "UPVOTE" | "DOWNVOTE" | "UNVOTE";
 
 interface Props {
     quote: Quote,
     onAction: (type: ActionType) => void,
-    readonly?: boolean
+    children?: ReactNode
 }
 
 const QuoteCard = (props: Props) => {
 
-    const { oidcUser } = useOidcUser();
-
     const [vote, setVote] = useState<"UP" | "DOWN" | null>(null);
 
     useEffect(() => props.onAction(`${vote || "UN"}VOTE`), [vote]);
-
-    const canHide = () => isEboardOrRTP(oidcUser)
-        || props.quote.shards.map(s => s.speaker.uid).includes(oidcUser.preferred_username || "");
-
-    if (!oidcUser) return <></>;
 
     return (
         <Card className="mb-3">
@@ -67,17 +57,9 @@ const QuoteCard = (props: Props) => {
                     </a>
                     &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
                 </p>
-                {!props.readonly &&
-                    <span className="float-right">
-                        {oidcUser.preferred_username === props.quote.submitter.uid &&
-                            <ConfirmDialog onClick={() => props.onAction("DELETE")} buttonClassName="btn-danger">Delete</ConfirmDialog>}
-
-                        {canHide()
-                            && <ConfirmDialog onClick={() => props.onAction("HIDE")} buttonClassName="btn-warning ml-1">Hide</ConfirmDialog>}
-
-                        <Button className="btn-danger ml-1" onClick={() => props.onAction("REPORT")}>Report</Button>
-                    </span>
-                }
+                <span className="float-right">
+                    {props.children}
+                </span>
             </CardFooter>
         </Card>
     )
