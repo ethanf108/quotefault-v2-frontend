@@ -96,10 +96,7 @@ const SubmitQuote = () => {
                 <ReactSortable list={quoteEntries} setList={setQuoteEntries} handle=".grab-drag" >
                     {quoteEntries.map((q, i) =>
                         <div key={i} className="d-flex align-items-center">
-                            {
-                                quoteEntries.length > 1 &&
-                                <FontAwesomeIcon icon={faBars} className="fa-lg mr-4 grab-drag" />
-                            }
+                            <FontAwesomeIcon icon={faBars} className="fa-lg mr-4 grab-drag" />
                             <Input
                                 className="mr-3"
                                 type="text"
@@ -117,12 +114,11 @@ const SubmitQuote = () => {
                         </div>
                     )}
                 </ReactSortable>
-                <Button
-                    className={`float-right mt-2 shadow-none ${quoteEntries.length < 6 && "text-success"}`}
-                    onClick={addQuoteEntry}
-                    disabled={quoteEntries.length >= 6}>
-                    <FontAwesomeIcon icon={faCirclePlus} />
-                </Button>
+                {quoteEntries.length < 6 &&
+                    <Button className="float-right my-2 shadow-none text-success" onClick={addQuoteEntry}>
+                        <FontAwesomeIcon icon={faCirclePlus} />
+                    </Button>
+                }
                 <Container className="d-flex px-0 pt-3">
                     <Button disabled={!canSubmit()} onClick={submit} size="sm" color="primary" className="flex-grow-1">Submit</Button>
                 </Container>
