@@ -77,7 +77,7 @@ const SubmitQuote = () => {
                 speaker: extractUsername(s),
             }))
         })
-            .then(_ => {
+            .then(() => {
                 toast.success("Submitted Quote!", { theme: "colored" });
                 setQuoteEntries([
                     {
@@ -105,7 +105,7 @@ const SubmitQuote = () => {
                                 onChange={e => changeQuoteText(q.id, e.target.value)}
                             />
                             <UserPicker value={q.speaker} onChange={e => changeQuoteUsername(q.id, e)} userList={userList} />
-                            <Button className="shadow-none" onClick={_ => deleteQuoteEntry(q)} disabled={quoteEntries.length <= 1}>
+                            <Button className="shadow-none" onClick={() => deleteQuoteEntry(q)} disabled={quoteEntries.length <= 1}>
                                 <FontAwesomeIcon
                                     icon={faCircleMinus}
                                     className={`${quoteEntries.length > 1 && "text-danger"} flex-grow-1`}

@@ -5,25 +5,29 @@ import { toast } from "react-toastify";
 export const baseURL: string = `${window.location.protocol}//${window.location.hostname}${window.location.port ? `:${window.location.port}` : ''}`;
 
 type FetchFunc = (input: RequestInfo | URL, init?: RequestInit | undefined) => Promise<Response>;
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+type Dict = { [key: string]: any };
 
-export const useFetch = <T>(url: string, params?: any): T | null => {
+export const useFetch = <T>(url: string, params?: Dict): T | null => {
     const [ret, setRet] = useState<T | null>(null);
 
     const { fetch } = useOidcFetch();
 
     useEffect(() => {
         apiGet(fetch)<T>(url, params || {}).then(setRet)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return ret;
 }
 
-export const useFetchArray = <T>(url: string, params?: any): T[] => {
+export const useFetchArray = <T>(url: string, params?: Dict): T[] => {
     const [ret, setRet] = useState<T[]>([]);
 
     const { fetch } = useOidcFetch();
 
     useEffect(() => {
         apiGet(fetch)<T[]>(url, params || {}).then(setRet)
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
     return ret;
 }
@@ -40,7 +44,7 @@ export const useApi = () => {
 }
 
 // Can't name a method `get`, so ...
-const apiGet = (fetch: FetchFunc) => <T>(url: string, params?: any): Promise<T> => {
+const apiGet = (fetch: FetchFunc) => <T>(url: string, params?: Dict): Promise<T> => {
     if (!url.startsWith("/")) {
         url = "/" + url;
     }
@@ -52,7 +56,7 @@ const apiGet = (fetch: FetchFunc) => <T>(url: string, params?: any): Promise<T> 
         } else {
             url += "&";
         }
-        url += encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+        url += encodeURIComponent(key) + "=" + encodeURIComponent(params![key]);
     }
 
     return fetch(baseURL + url)
@@ -65,7 +69,7 @@ const apiGet = (fetch: FetchFunc) => <T>(url: string, params?: any): Promise<T> 
         .then(e => e as T);
 }
 
-const apiPostPutPatch = (fetch: FetchFunc, method: "POST" | "PUT" | "PATCH") => (url: string, body?: any, params?: any): Promise<Response> => {
+const apiPostPutPatch = (fetch: FetchFunc, method: "POST" | "PUT" | "PATCH") => (url: string, body?: Dict, params?: Dict): Promise<Response> => {
     if (!url.startsWith("/")) {
         url = "/" + url;
     }
@@ -77,7 +81,7 @@ const apiPostPutPatch = (fetch: FetchFunc, method: "POST" | "PUT" | "PATCH") => 
         } else {
             url += "&";
         }
-        url += encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+        url += encodeURIComponent(key) + "=" + encodeURIComponent(params![key]);
     }
     let describe: RequestInit = {
         method: method,
@@ -101,7 +105,7 @@ const apiPostPutPatch = (fetch: FetchFunc, method: "POST" | "PUT" | "PATCH") => 
 }
 
 //can't name function `delete` 😞
-const apiDelete = (fetch: FetchFunc) => (url: string, params?: any): Promise<Response> => {
+const apiDelete = (fetch: FetchFunc) => (url: string, params?: Dict): Promise<Response> => {
     if (!url.startsWith("/")) {
         url = "/" + url;
     }
@@ -113,7 +117,7 @@ const apiDelete = (fetch: FetchFunc) => (url: string, params?: any): Promise<Res
         } else {
             url += "&";
         }
-        url += encodeURIComponent(key) + "=" + encodeURIComponent(params[key]);
+        url += encodeURIComponent(key) + "=" + encodeURIComponent(params![key]);
     }
     return fetch(baseURL + url, {
         method: "DELETE"
@@ -126,6 +130,7 @@ const apiDelete = (fetch: FetchFunc) => (url: string, params?: any): Promise<Res
         });
 }
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export const toastError = (message: string) => (err: any) => {
     toast.error(`${message}: ${JSON.stringify(err)}`, {
         theme: "colored"

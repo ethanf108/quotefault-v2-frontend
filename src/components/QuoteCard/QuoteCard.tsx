@@ -17,6 +17,8 @@ const QuoteCard = (props: Props) => {
 
     const [vote, setVote] = useState<"UP" | "DOWN" | null>(null);
 
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(() => props.onAction(`${vote || "UN"}VOTE`), [vote]);
 
     return (

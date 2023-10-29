@@ -46,10 +46,11 @@ const Storage = () => {
                 }
                 return q;
             })
-            .then(q => setQuotes([...quotes, ...q]))
+            .then(q => setQuotes(quotes => [...quotes, ...q]))
             .catch(toastError("Error fetching Quotes"))
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(fetchQuotes, [page]);
 
     const fetchSearch = () => {
@@ -80,6 +81,8 @@ const Storage = () => {
 
     const reportQuote = (quote: Quote) => window.location.assign(`/report?id=${quote.id}`);
 
+
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const dispatchAction = (_quote: Quote) => (action: ActionType) => {
         switch (action) {
             default: {
