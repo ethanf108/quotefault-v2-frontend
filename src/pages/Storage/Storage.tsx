@@ -68,16 +68,20 @@ const Storage = () => {
         || q.shards.map(s => s.speaker.uid).includes(oidcUser.preferred_username || "");
 
 
-    const deleteQuote = (quote: Quote) =>
+    const deleteQuote = (quote: Quote) => {
         apiDelete(`/api/quote/${quote.id}`)
             .then(() => toast.success("Deleted Quote!", { theme: "colored" }))
             .then(() => setQuotes(quotes.filter(q => q.id !== quote.id)))
             .catch(toastError("Failed to delete quote"));
+        setQuotes(quotes => quotes.filter(q => q.id !== quote.id));
+    }
 
-    const hideQuote = (quote: Quote) =>
+    const hideQuote = (quote: Quote) => {
         apiPut(`/api/quote/${quote.id}/hide`)
             .then(() => updateQuote(quote.id))
             .catch(toastError("Failed to hide quote"));
+        setQuotes(quotes => quotes.filter(q => q.id !== quote.id));
+    }
 
     const reportQuote = (quote: Quote) => window.location.assign(`/report?id=${quote.id}`);
 
