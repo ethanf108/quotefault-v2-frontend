@@ -38,7 +38,7 @@ const NavBar = () => {
                             isEboardOrRTP(oidcUser) &&
                             <>
                                 <NavItem>
-                                    <NavLink href="/storage">
+                                    <NavLink href="/hidden">
                                         <FontAwesomeIcon icon={faWarning} className="mr-1" />
                                         Hidden
                                     </NavLink>

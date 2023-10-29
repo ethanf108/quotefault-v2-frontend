@@ -69,7 +69,6 @@ const SubmitQuote = () => {
 
     const canSubmit = () => quoteEntries.every(q => q.body.length > 0 && userList.map(u => u.uid.toLocaleLowerCase()).includes(extractUsername(q)));
 
-    // TODO implement API route
     const submit = () => {
         apiPost("/api/quote", {
             shards: quoteEntries.map(s => ({
