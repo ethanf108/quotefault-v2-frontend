@@ -16,3 +16,11 @@ export interface Quote {
     submitter: CSHUser,
     timestamp: Date,
 }
+
+export interface Report {
+    quote_id: number,
+    reports: [{
+        reason: string,
+        timestamp: Date,
+    }]
+}

@@ -6,6 +6,7 @@ import Storage from "./pages/Storage"
 import { ToastContainer } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css';
 import SubmitReport from "./pages/SubmitReport"
+import Reports from "./pages/Reports"
 
 function App() {
 
@@ -19,6 +20,7 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/storage" element={<Storage />} />
                         <Route path="/report" element={<SubmitReport />} />
+                        <Route path="/reports" element={<Reports />} />
                     </Routes>
                 </Container>
             </Container>

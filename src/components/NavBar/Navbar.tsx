@@ -45,7 +45,7 @@ const NavBar = () => {
                                 </NavItem>
 
                                 <NavItem>
-                                    <NavLink href="/storage">
+                                    <NavLink href="/reports">
                                         <FontAwesomeIcon icon={faFlag} className="mr-1" />
                                         Reports
                                     </NavLink>
