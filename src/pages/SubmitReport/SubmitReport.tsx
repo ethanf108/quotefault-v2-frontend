@@ -33,7 +33,7 @@ const SubmitReport = () => {
 
     return (
         <Container>
-            <QuoteCard quote={quote} onAction={() => { }} />
+            <QuoteCard quote={quote} />
             <Card>
                 <CardHeader>
                     <CardTitle>Report Message</CardTitle>

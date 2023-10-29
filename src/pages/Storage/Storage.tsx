@@ -21,7 +21,7 @@ const Storage = (props: Props) => {
 
     const { oidcUser } = useOidcUser();
 
-    const { apiGet, apiPut, apiDelete } = useApi();
+    const { apiGet, apiPut, apiDelete, apiPost } = useApi();
 
     const [quotes, setQuotes] = useState<QuoteDict>([]);
 
@@ -56,7 +56,7 @@ const Storage = (props: Props) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(fetchQuotes, [page]);
 
-    const updateQuote = (id: number) => () =>
+    const updateQuote = (id: number) =>
         apiGet<Quote>(`/api/quote/${id}`)
             .then(q => setQuotes(getQuotes().map(o => o.id === q.id ? q : o)))
             .catch(toastError("Failed to update quote"));
@@ -78,19 +78,25 @@ const Storage = (props: Props) => {
 
     const hideQuote = (quote: Quote) => {
         apiPut(`/api/quote/${quote.id}/hide`)
-            .then(() => updateQuote(quote.id))
+            .then(() => setQuotes(getQuotes().filter(q => q.id !== quote.id)))
             .catch(toastError("Failed to hide quote"));
         setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id));
     }
 
     const reportQuote = (quote: Quote) => window.location.assign(`/report?id=${quote.id}`);
 
-
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const dispatchAction = (_quote: Quote) => (action: ActionType) => {
+    const voteChange = (quote: Quote) => (action: ActionType) => {
         switch (action) {
+            case "UNVOTE": {
+                apiDelete(`/api/quote/${quote.id}/vote`)
+                    .then(() => updateQuote(quote.id))
+                    .catch(toastError("Failed to alter vote"))
+                break;
+            }
             default: {
-                toast.info(`Action (${action}) not yet implemented :( (coles fault tbh)`, { theme: "colored" })
+                apiPost(`/api/quote/${quote.id}/vote`, undefined, { vote: action.toLowerCase() })
+                    .then(() => updateQuote(quote.id))
+                    .catch(toastError("Failed to alter vote"))
             }
         }
     }
@@ -103,12 +109,12 @@ const Storage = (props: Props) => {
             dataLength={getQuotes().length}
             next={() => setPage(page + 1)}
             hasMore={isMore}
-            loader={<p>Loading ...</p>}
+            loader={<p className="text-center">Loading ...</p>}
         >
             <Container>
                 {
                     getQuotes().sort(sortQuotes).map((q, i) =>
-                        <QuoteCard key={i} quote={q} onAction={dispatchAction(q)} >
+                        <QuoteCard key={i} quote={q} onVoteChange={voteChange(q)}>
 
                             {oidcUser.preferred_username === q.submitter.uid &&
                                 <ConfirmDialog onClick={() => deleteQuote(q)} buttonClassName="btn-danger">Delete</ConfirmDialog>}

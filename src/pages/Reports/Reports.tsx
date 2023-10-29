@@ -57,7 +57,7 @@ const Reports = () => {
                 reports.filter(r => r.quote).sort(sortQuotes).map((r, i) =>
                     <Card className="mb-3" key={i}>
                         <CardBody>
-                            <QuoteCard quote={r.quote!} onAction={() => { }} hideVotes />
+                            <QuoteCard quote={r.quote!} />
                             {
                                 r.reports.map((r, j) =>
                                     <div key={`${i}-${j}`} className="mt-3">

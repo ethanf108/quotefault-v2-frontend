@@ -2,24 +2,26 @@ import { Card, CardBody, CardFooter } from "reactstrap";
 import { Quote, formatUser } from "../../API/Types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare, faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp } from "@fortawesome/free-solid-svg-icons";
-import { ReactNode, useEffect, useState } from "react";
+import { ReactNode, useState } from "react";
 
 export type ActionType = "UPVOTE" | "DOWNVOTE" | "UNVOTE";
 
 interface Props {
     quote: Quote,
-    onAction: (type: ActionType) => void,
+    onVoteChange?: (type: ActionType) => void,
     children?: ReactNode,
-    hideVotes?: boolean
 }
+
+type VoteState = "UP" | "DOWN" | null;
 
 const QuoteCard = (props: Props) => {
 
-    const [vote, setVote] = useState<"UP" | "DOWN" | null>(null);
+    const [vote, setVote] = useState<VoteState>(null);
 
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(() => props.onAction(`${vote || "UN"}VOTE`), [vote]);
+    const updateVote = (state: VoteState) => {
+        props.onVoteChange!(`${state || "UN"}VOTE`);
+        setVote(state);
+    }
 
     return (
         <Card className="mb-3">
@@ -38,16 +40,16 @@ const QuoteCard = (props: Props) => {
                         )
                     }
                 </span>
-                {!props.hideVotes &&
+                {props.onVoteChange &&
                     <span className="float-right ml-4 mr d-flex flex-column">
                         <FontAwesomeIcon
                             icon={vote === "UP" ? faSquareCaretUp : faCaretUp}
-                            onClick={() => setVote(vote === "UP" ? null : "UP")}
+                            onClick={() => updateVote(vote === "UP" ? null : "UP")}
                             className={`fa-3x ${vote === "UP" ? "text-success" : ""}`} />
                         <h2 className="text-center my-0 mx-2">999</h2>
                         <FontAwesomeIcon
                             icon={vote === "DOWN" ? faSquareCaretDown : faCaretDown}
-                            onClick={() => setVote(vote === "DOWN" ? null : "DOWN")}
+                            onClick={() => updateVote(vote === "DOWN" ? null : "DOWN")}
                             className={`fa-3x dw-100 ${vote === "DOWN" ? "text-danger" : ""}`} />
                     </span>
                 }
