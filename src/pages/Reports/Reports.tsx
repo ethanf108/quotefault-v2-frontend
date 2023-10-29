@@ -23,16 +23,15 @@ const Reports = () => {
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    const fetchQuote = (report: ReportData) => {
-        apiGet<Quote>(`/api/quote/${report.quote_id}`)
-            .then(q => setReports(rs => rs.map(r => r.quote_id === q.id ? { ...r, quote: q } : r)))
-            .catch(toastError(`Failed to fetch Quote for quote_id ${report.quote_id}`))
-    }
-
     useEffect(() => {
-        reports
-            .filter(r => !r.quote)
-            .forEach(fetchQuote);
+        for (const r of reports) {
+            if (!r.quote) {
+                apiGet<Quote>(`/api/quote/${r.quote_id}`)
+                    .then(q => setReports(rs => rs.map(r => r.quote_id === q.id ? { ...r, quote: q } : r)))
+                    .catch(toastError(`Failed to fetch Quote for quote_id ${r.quote_id}`));
+                return;
+            }
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [reports]);
 
