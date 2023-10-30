@@ -114,7 +114,7 @@ const Storage = (props: Props) => {
     const sortQuotes = (a: Quote, b: Quote) =>
         ((a, b) => b.getTime() - a.getTime())(new Date(a.timestamp), new Date(b.timestamp));
 
-    const canBeFunny = () => !isMore && searchQuery === "";
+    const canBeFunny = () => !isMore && searchQuery === "" && props.storageType === "STORAGE";
 
     return (
         <Container>

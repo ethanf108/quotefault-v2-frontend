@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDatabase, faFlag, faWarning } from "@fortawesome/free-solid-svg-icons";
 import { useOidcUser } from "@axa-fr/react-oidc";
 import { isEboardOrRTP } from "../../util";
+import GitNav from "./GitNav";
 
 const NavBar = () => {
 
@@ -52,6 +53,7 @@ const NavBar = () => {
                                 </NavItem>
                             </>
                         }
+                        <GitNav />
                     </Nav>
                 </Collapse>
                 {profile("d-none d-md-inline")}

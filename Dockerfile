@@ -1,6 +1,11 @@
 FROM node:alpine as build
 WORKDIR /app
 COPY . .
+COPY .git/ .git/
+
+RUN apk add git
+RUN sh ./git-parse.sh
+
 ENV npm_config_cache /app/.npm
 RUN npm ci --silent
 RUN npm run build
