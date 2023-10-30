@@ -37,9 +37,8 @@ const Storage = (props: Props) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
 
     const fetchQuotes = (quotes?: QuoteDict) => {
-        // TODO Fix 9999
         apiGet<Quote[]>(`/api/${props.storageType === "STORAGE" ? "quotes" : "hidden"}`, {
-            lt: getQuotes(quotes).reduce((a, b) => a.id < b.id ? a : b, { id: 9999 }).id,
+            lt: getQuotes(quotes).reduce((a, b) => a.id < b.id && a.id != 0 ? a : b, { id: 0 }).id,
             limit: pageSize,
             ...(search === "" ? {} : { q: search })
         })
