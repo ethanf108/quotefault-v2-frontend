@@ -29,3 +29,8 @@ export interface Report {
         timestamp: Date,
     }]
 }
+
+export interface GitData {
+    revision: string,
+    url: string,
+}

@@ -59,9 +59,11 @@ const NavBar = () => {
                                 </NavItem>
                             </>
                         }
-                        <GitNav />
                     </Nav>
                 </Collapse>
+                <span className="d-none d-md-inline">
+                    <GitNav />
+                </span>
                 {profile("d-none d-md-inline")}
             </Container>
         </Navbar>

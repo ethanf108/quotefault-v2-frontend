@@ -1,26 +1,45 @@
 import { faArrowUpRightFromSquare, faCodeBranch } from "@fortawesome/free-solid-svg-icons";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { NavItem, NavLink } from "reactstrap";
+import { DropdownItem, DropdownMenu, DropdownToggle, Nav, UncontrolledDropdown } from "reactstrap";
+import { useFetch } from "../../API/API";
+import { GitData } from "../../API/Types";
 
 // I don't like this :(
-const gitCommitURL = "%%%URL%%%";
-const gitCommitHash = "%%%COMMIT%%%";
+const frontendGitCommitURL = "%%%URL%%%";
+const frontendGitCommitHash = "%%%COMMIT%%%";
 
 const GitNav = () => {
 
-    if (gitCommitHash.startsWith("%")) {
-        return <></>;
-    }
+    const backendGit = useFetch<GitData>("/api/version");
 
     return (
+        <Nav navbar>
+            <UncontrolledDropdown nav inNavbar>
+                <DropdownToggle nav caret>
+                    <span className="ml-2 d-none d-md-inline">
+                        <FontAwesomeIcon icon={faCodeBranch} />
+                    </span>
+                </DropdownToggle>
 
-        <NavItem>
-            <NavLink href={`${gitCommitURL}/tree/${gitCommitHash}`} rel="noopener" target="_blank">
-                <FontAwesomeIcon icon={faCodeBranch} className="mr-" />
-                <span className="mx-1">{gitCommitHash.substring(0, 7)}</span>
-                <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="fa-xs" />
-            </NavLink>
-        </NavItem>
+                <DropdownMenu>
+                    <a href={`${frontendGitCommitURL}/tree/${frontendGitCommitHash}`} rel="noopener" target="_blank">
+                        <DropdownItem>
+                            Frontend
+                            <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="ml-1" />
+                        </DropdownItem>
+                    </a>
+
+                    {backendGit &&
+                        <a href={`${backendGit.url}/tree/${backendGit.revision}`} rel="noopener" target="_blank">
+                            <DropdownItem>
+                                Backend
+                                <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="ml-1" />
+                            </DropdownItem>
+                        </a>
+                    }
+                </DropdownMenu>
+            </UncontrolledDropdown>
+        </Nav>
     )
 }
 
