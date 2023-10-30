@@ -151,7 +151,11 @@ const Storage = (props: Props) => {
                                     <Button className="btn-danger ml-1" onClick={() => reportQuote(q)}>Report</Button>}
                             </QuoteCard>)
                     }
-
+                    {
+                        isMore && <div className="d-flex justify-content-center mb-3">
+                            <Button onClick={() => fetchQuotes()} className="btn-info">Load more</Button>
+                        </div>
+                    }
                     {canBeFunny() && <div className="text-center mb-3">How did you read ALL of the quotes lol</div>}
                 </Container>
             </InfiniteScroll>
