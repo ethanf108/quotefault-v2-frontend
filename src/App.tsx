@@ -20,6 +20,7 @@ function App() {
                         <Route path="/" element={<Home />} />
                         <Route path="/storage" element={<Storage storageType="STORAGE" />} />
                         <Route path="/hidden" element={<Storage storageType="HIDDEN" />} />
+                        <Route path="/personal" element={<Storage storageType="SELF" />} />
                         <Route path="/report" element={<SubmitReport />} />
                         <Route path="/reports" element={<Reports />} />
                     </Routes>

@@ -2,7 +2,7 @@ import { Collapse, Container, Nav, NavItem, NavLink, Navbar, NavbarToggler } fro
 import Profile from "../Profile";
 import { useState } from "react";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faDatabase, faFlag, faWarning } from "@fortawesome/free-solid-svg-icons";
+import { faDatabase, faFlag, faUser, faWarning } from "@fortawesome/free-solid-svg-icons";
 import { useOidcUser } from "@axa-fr/react-oidc";
 import { isEboardOrRTP } from "../../util";
 import GitNav from "./GitNav";
@@ -33,6 +33,12 @@ const NavBar = () => {
                             <NavLink href="/storage">
                                 <FontAwesomeIcon icon={faDatabase} className="mr-1" />
                                 Storage
+                            </NavLink>
+                        </NavItem>
+                        <NavItem>
+                            <NavLink href="/personal">
+                                <FontAwesomeIcon icon={faUser} className="mr-1" />
+                                Personal
                             </NavLink>
                         </NavItem>
                         {

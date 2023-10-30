@@ -14,7 +14,7 @@ import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 const pageSize = 5;
 
 interface Props {
-    storageType: "STORAGE" | "HIDDEN",
+    storageType: "STORAGE" | "HIDDEN" | "SELF",
 }
 
 type QuoteDict = { [key: number]: Quote };
@@ -37,10 +37,11 @@ const Storage = (props: Props) => {
     const [searchQuery, setSearchQuery] = useState<string>("");
 
     const fetchQuotes = (quotes?: QuoteDict) => {
+        if (!oidcUser) { return; }
         apiGet<Quote[]>("/api/quotes", {
             lt: getQuotes(quotes).reduce((a, b) => a.id < b.id && a.id != 0 ? a : b, { id: 0 }).id,
             limit: pageSize,
-            hidden: props.storageType === "HIDDEN",
+            ...(props.storageType !== "SELF" ? { hidden: props.storageType === "HIDDEN" } : { involved: oidcUser.preferred_username }),
             ...(search === "" ? {} : { q: search })
         })
             .then(q => {
@@ -57,7 +58,7 @@ const Storage = (props: Props) => {
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(fetchQuotes, []);
+    useEffect(fetchQuotes, [oidcUser]);
 
     const updateQuote = (id: number) =>
         apiGet<Quote>(`/api/quote/${id}`)
@@ -66,8 +67,9 @@ const Storage = (props: Props) => {
 
 
     const canHide = (q: Quote) =>
-        props.storageType === "STORAGE" &&
-        (isEboardOrRTP(oidcUser)
+        props.storageType !== "HIDDEN"
+        && !q.hidden
+        && (isEboardOrRTP(oidcUser)
             || q.shards.map(s => s.speaker.uid).includes(oidcUser.preferred_username || ""));
 
 

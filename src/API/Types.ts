@@ -18,7 +18,8 @@ export interface Quote {
     submitter: CSHUser,
     timestamp: Date,
     score: number,
-    vote: Vote
+    vote: Vote,
+    hidden: boolean | null,
 }
 
 export interface Report {
