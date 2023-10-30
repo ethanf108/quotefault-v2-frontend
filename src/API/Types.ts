@@ -10,11 +10,15 @@ export interface QuoteShard {
     speaker: CSHUser,
 }
 
+export type Vote = "upvote" | "downvote" | null;
+
 export interface Quote {
     id: number,
     shards: QuoteShard[],
     submitter: CSHUser,
     timestamp: Date,
+    score: number,
+    vote: Vote
 }
 
 export interface Report {

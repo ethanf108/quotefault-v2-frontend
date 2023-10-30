@@ -1,27 +1,27 @@
 import { Card, CardBody, CardFooter } from "reactstrap";
-import { Quote, formatUser } from "../../API/Types";
+import { Quote, Vote, formatUser } from "../../API/Types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faArrowUpRightFromSquare, faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp } from "@fortawesome/free-solid-svg-icons";
-import { ReactNode, useState } from "react";
-
-export type ActionType = "UPVOTE" | "DOWNVOTE" | "UNVOTE";
+import { ReactNode, useEffect, useState } from "react";
 
 interface Props {
     quote: Quote,
-    onVoteChange?: (type: ActionType) => void,
+    onVoteChange?: (type: Vote) => void,
     children?: ReactNode,
 }
 
-type VoteState = "UP" | "DOWN" | null;
-
 const QuoteCard = (props: Props) => {
 
-    const [vote, setVote] = useState<VoteState>(null);
+    const [vote, setVote] = useState<Vote>(null);
 
-    const updateVote = (state: VoteState) => {
-        props.onVoteChange!(`${state || "UN"}VOTE`);
+    const updateVote = (state: Vote) => {
+        props.onVoteChange!(state);
         setVote(state);
     }
+
+    useEffect(() => {
+        setVote(props.quote.vote);
+    }, [props.quote]);
 
     return (
         <Card className="mb-3">
@@ -41,16 +41,16 @@ const QuoteCard = (props: Props) => {
                     }
                 </span>
                 {props.onVoteChange &&
-                    <span className="float-right ml-4 mr d-flex flex-column">
+                    <span className="float-right ml-4 mr- d-flex flex-column">
                         <FontAwesomeIcon
-                            icon={vote === "UP" ? faSquareCaretUp : faCaretUp}
-                            onClick={() => updateVote(vote === "UP" ? null : "UP")}
-                            className={`fa-3x ${vote === "UP" ? "text-success" : ""}`} />
-                        <h2 className="text-center my-0 mx-2">999</h2>
+                            icon={vote === "upvote" ? faSquareCaretUp : faCaretUp}
+                            onClick={() => updateVote(vote === "upvote" ? null : "upvote")}
+                            className={`fa-3x ${vote === "upvote" ? "text-success" : ""}`} />
+                        <h2 className="text-center my-0 mx-2" style={{ minWidth: "2rem" }}>{props.quote.score}</h2>
                         <FontAwesomeIcon
-                            icon={vote === "DOWN" ? faSquareCaretDown : faCaretDown}
-                            onClick={() => updateVote(vote === "DOWN" ? null : "DOWN")}
-                            className={`fa-3x dw-100 ${vote === "DOWN" ? "text-danger" : ""}`} />
+                            icon={vote === "downvote" ? faSquareCaretDown : faCaretDown}
+                            onClick={() => updateVote(vote === "downvote" ? null : "downvote")}
+                            className={`fa-3x dw-100 ${vote === "downvote" ? "text-danger" : ""}`} />
                     </span>
                 }
             </CardBody>

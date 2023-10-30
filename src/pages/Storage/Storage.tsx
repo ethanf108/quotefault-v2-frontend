@@ -1,10 +1,10 @@
 import { useEffect, useState } from "react";
-import { Quote } from "../../API/Types";
+import { Quote, Vote } from "../../API/Types";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { toastError, useApi } from "../../API/API";
 import { Button, Card, CardBody, Container, Input } from "reactstrap";
 import { toast } from "react-toastify";
-import QuoteCard, { ActionType } from "../../components/QuoteCard/QuoteCard";
+import QuoteCard from "../../components/QuoteCard/QuoteCard";
 import { useOidcUser } from "@axa-fr/react-oidc";
 import ConfirmDialog from "../../components/ConfirmDialog";
 import { isEboardOrRTP } from "../../util";
@@ -55,6 +55,7 @@ const Storage = (props: Props) => {
             .catch(toastError("Error fetching Quotes"))
     }
 
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     useEffect(fetchQuotes, []);
 
     const updateQuote = (id: number) =>
@@ -86,16 +87,16 @@ const Storage = (props: Props) => {
 
     const reportQuote = (quote: Quote) => window.location.assign(`/report?id=${quote.id}`);
 
-    const voteChange = (quote: Quote) => (action: ActionType) => {
+    const voteChange = (quote: Quote) => (action: Vote) => {
         switch (action) {
-            case "UNVOTE": {
+            case null: {
                 apiDelete(`/api/quote/${quote.id}/vote`)
                     .then(() => updateQuote(quote.id))
                     .catch(toastError("Failed to alter vote"))
                 break;
             }
             default: {
-                apiPost(`/api/quote/${quote.id}/vote`, undefined, { vote: action.toLowerCase() })
+                apiPost(`/api/quote/${quote.id}/vote`, undefined, { vote: action })
                     .then(() => updateQuote(quote.id))
                     .catch(toastError("Failed to alter vote"))
             }
@@ -106,6 +107,7 @@ const Storage = (props: Props) => {
         setQuotes([]);
         setIsMore(true);
         fetchQuotes({});
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [searchQuery]);
 
     const sortQuotes = (a: Quote, b: Quote) =>
