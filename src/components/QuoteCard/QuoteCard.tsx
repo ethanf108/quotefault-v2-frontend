@@ -25,7 +25,7 @@ const QuoteCard = (props: Props) => {
 
     return (
         <Card className="mb-3">
-            <CardBody className="d-flex">
+            <CardBody className="d-flex pr-2">
                 <span className="float-left flex-grow-1">
                     {
                         props.quote.shards.map((s, i) =>
@@ -41,12 +41,12 @@ const QuoteCard = (props: Props) => {
                     }
                 </span>
                 {props.onVoteChange &&
-                    <span className="float-right ml-4 mr- d-flex flex-column">
+                    <span className="float-right ml-4 d-flex flex-column">
                         <FontAwesomeIcon
                             icon={vote === "upvote" ? faSquareCaretUp : faCaretUp}
                             onClick={() => updateVote(vote === "upvote" ? null : "upvote")}
                             className={`fa-3x ${vote === "upvote" ? "text-success" : ""}`} />
-                        <h2 className="text-center my-0 mx-2" style={{ minWidth: "2rem" }}>{props.quote.score}</h2>
+                        <h2 className="text-center my-0 mx-2" style={{ minWidth: "3rem" }}>{props.quote.score}</h2>
                         <FontAwesomeIcon
                             icon={vote === "downvote" ? faSquareCaretDown : faCaretDown}
                             onClick={() => updateVote(vote === "downvote" ? null : "downvote")}
