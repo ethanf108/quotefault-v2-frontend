@@ -10,6 +10,7 @@ import ConfirmDialog from "../../components/ConfirmDialog";
 import { isEboardOrRTP } from "../../util";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { useSearchParams } from "react-router-dom";
 
 const pageSize = 5;
 
@@ -22,6 +23,8 @@ type QuoteDict = { [key: number]: Quote };
 const Storage = (props: Props) => {
 
     const { oidcUser } = useOidcUser();
+
+    const [queryParams] = useSearchParams();
 
     const { apiGet, apiPut, apiDelete, apiPost } = useApi();
 
@@ -42,6 +45,7 @@ const Storage = (props: Props) => {
             lt: getQuotes(quotes).reduce((a, b) => a.id < b.id && a.id != 0 ? a : b, { id: 0 }).id,
             limit: pageSize,
             ...(props.storageType !== "SELF" ? { hidden: props.storageType === "HIDDEN" } : { involved: oidcUser.preferred_username }),
+            ...(queryParams.has("involved") ? { involved: queryParams.get("involved") } : {}),
             ...(search === "" ? {} : { q: search })
         })
             .then(q => {
@@ -118,9 +122,31 @@ const Storage = (props: Props) => {
 
     const canBeFunny = () => !isMore && searchQuery === "" && props.storageType === "STORAGE";
 
+    const headerText = (() => {
+        let ret;
+        if (queryParams.has("involved")) {
+            ret = `Quotes from ${queryParams.get("involved")}`;
+        } else {
+            ret = (() => {
+                switch (props.storageType) {
+                    case "STORAGE":
+                        return "Storage"
+                    case "SELF":
+                        return "My Quotes"
+                    case "HIDDEN":
+                        return "Hidden Quotes 😳"
+                }
+            })()
+        }
+        if (searchQuery) {
+            return `Searching for "${searchQuery}" in ${ret}`;
+        }
+        return ret;
+    })();
+
     return (
         <Container>
-            <Card className="mb-5">
+            <Card>
                 <CardBody className="d-flex py-1">
                     <Input type="text" placeholder="Search" className="mx-2" value={search} onChange={e => setSearch(e.target.value)} />
                     <Button className="btn-sm shadow-none btn-info d-flex align-items-center" onClick={() => setSearchQuery(search)}>
@@ -137,6 +163,8 @@ const Storage = (props: Props) => {
                 loader={<p className="text-center">Loading ...</p>}
             >
                 <Container>
+
+                    <h1 className="my-5">{headerText}</h1>
 
                     {
                         getQuotes().sort(sortQuotes).map((q, i) =>

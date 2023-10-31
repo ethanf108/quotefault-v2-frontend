@@ -1,7 +1,7 @@
 import { Card, CardBody, CardFooter } from "reactstrap";
 import { Quote, Vote, formatUser } from "../../API/Types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faArrowUpRightFromSquare, faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp } from "@fortawesome/free-solid-svg-icons";
 import { ReactNode, useEffect, useState } from "react";
 
 interface Props {
@@ -31,10 +31,8 @@ const QuoteCard = (props: Props) => {
                         props.quote.shards.map((s, i) =>
                             <p key={i}>
                                 &quot;{s.body}&quot; - &nbsp;
-                                <a href={`https://profiles.csh.rit.edu/user/${s.speaker.uid}`} rel="noopener" target="_blank" className="text-primary">
+                                <a href={`/personal?involved=${s.speaker.uid}`} className="text-primary">
                                     <b>{formatUser(s.speaker)}</b>
-                                    &nbsp;
-                                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="fa-xs" />
                                 </a>
                             </p>
                         )
@@ -57,10 +55,8 @@ const QuoteCard = (props: Props) => {
             <CardFooter>
                 <p className="float-left">
                     Submitted By &nbsp;
-                    <a href={`https://profiles.csh.rit.edu/user/${props.quote.submitter.uid}`} rel="noopener" target="_blank" className="text-primary">
+                    <a href={`/personal?involved=${props.quote.submitter.uid}`} className="text-primary">
                         <b>{formatUser(props.quote.submitter)}</b>
-                        &nbsp;
-                        <FontAwesomeIcon icon={faArrowUpRightFromSquare} className="fa-xs" />
                     </a>
                     &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
                 </p>
