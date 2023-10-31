@@ -39,7 +39,7 @@ const Reports = () => {
         ((a, b) => a.getTime() - b.getTime())(new Date(a.quote!.timestamp), new Date(b.quote!.timestamp));
 
     const resolve = (report: ReportData, action: "HIDE" | "IGNORE") => {
-        apiPut(`/api/quote/${report.quote_id}/resolve`, { hide: action === "HIDE" ? "true" : "false" })
+        apiPut(`/api/quote/${report.quote_id}/resolve`, undefined, { hide: action === "HIDE" })
             .then(() => {
                 toast.success("Reports resolved!", { theme: "colored" });
                 setReports(rs => rs.filter(r => r.quote_id !== report.quote_id));
