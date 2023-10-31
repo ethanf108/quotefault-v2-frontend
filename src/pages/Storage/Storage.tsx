@@ -12,7 +12,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
 import { useSearchParams } from "react-router-dom";
 
-const pageSize = 5;
+const pageSize = parseInt(process.env.QUOTEFAULT_STORAGE_PAGE_SIZE || "10");
 
 interface Props {
     storageType: "STORAGE" | "HIDDEN" | "SELF",
@@ -41,11 +41,16 @@ const Storage = (props: Props) => {
 
     const fetchQuotes = (quotes?: QuoteDict) => {
         if (!oidcUser) { return; }
+
+        const getVar = (name: string) => (queryParams.has(name) ? { [name]: queryParams.get(name) } : {});
+
         apiGet<Quote[]>("/api/quotes", {
             lt: getQuotes(quotes).reduce((a, b) => a.id < b.id && a.id != 0 ? a : b, { id: 0 }).id,
             limit: pageSize,
             ...(props.storageType !== "SELF" ? { hidden: props.storageType === "HIDDEN" } : { involved: oidcUser.preferred_username }),
-            ...(queryParams.has("involved") ? { involved: queryParams.get("involved") } : {}),
+            ...getVar("involved"),
+            ...getVar("submitter"),
+            ...getVar("speaker"),
             ...(search === "" ? {} : { q: search })
         })
             .then(q => {

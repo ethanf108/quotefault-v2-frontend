@@ -1,6 +1,6 @@
 import { useSearchParams } from "react-router-dom";
 import { Card, CardBody, CardHeader, CardTitle, Container, Input } from "reactstrap";
-import { useApi, useFetch } from "../../API/API";
+import { toastError, useApi, useFetch } from "../../API/API";
 import QuoteCard from "../../components/QuoteCard";
 import { Quote } from "../../API/Types";
 import ConfirmDialog from "../../components/ConfirmDialog";
@@ -25,6 +25,7 @@ const SubmitReport = () => {
                 toast.success("Submitted report!", { theme: "colored" })
                 setTimeout(() => window.location.assign("/"), 1000);
             })
+            .catch(toastError("Failed to submit report"));
     }
 
     if (!quote) {

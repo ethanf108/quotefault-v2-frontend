@@ -25,8 +25,8 @@ const NavBar = () => {
         <Navbar color="primary" dark expand="lg" fixed="top">
             <Container>
                 <NavLink href="/" className="navbar-brand" aria-hidden="true">Quotefault</NavLink>
-                <NavbarToggler onClick={toggle} />
                 {profile("d-md-none")}
+                <NavbarToggler onClick={toggle} />
                 <Collapse isOpen={isOpen} navbar>
                     <Nav navbar>
                         <NavItem>

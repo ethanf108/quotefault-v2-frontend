@@ -61,7 +61,7 @@ const apiGet = (fetch: FetchFunc) => <T>(url: string, params?: Dict): Promise<T>
 
     return fetch(baseURL + url)
         .then(body => {
-            if (body.status !== 200) {
+            if (body.status >= 400) {
                 throw body;
             }
             return body.json()
@@ -97,7 +97,7 @@ const apiPostPutPatch = (fetch: FetchFunc, method: "POST" | "PUT" | "PATCH") => 
     }
     return fetch(baseURL + url, describe)
         .then(response => {
-            if (response.status >= 300) {
+            if (response.status >= 400) {
                 throw response;
             }
             return response;
@@ -123,16 +123,16 @@ const apiDelete = (fetch: FetchFunc) => (url: string, params?: Dict): Promise<Re
         method: "DELETE"
     })
         .then(response => {
-            if (response.status !== 200) {
+            if (response.status >= 400) {
                 throw response;
             }
             return response;
         });
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const toastError = (message: string) => (err: any) => {
-    toast.error(`${message}: ${JSON.stringify(err)}`, {
-        theme: "colored"
-    });
+export const toastError = (message: string) => (err: Response) => {
+    err.text().then(err =>
+        toast.error(`${message}: ${err}`, {
+            theme: "colored"
+        }));
 }
