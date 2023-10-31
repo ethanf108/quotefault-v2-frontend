@@ -7,6 +7,7 @@ import { faBars, faCircleMinus, faCirclePlus } from "@fortawesome/free-solid-svg
 import { useApi, useFetchArray } from "../../API/API";
 import { CSHUser } from "../../API/Types";
 import { toast } from "react-toastify";
+import { useOidcUser } from "@axa-fr/react-oidc";
 
 interface QuoteEntry {
     id: number,
@@ -17,6 +18,8 @@ interface QuoteEntry {
 const SubmitQuote = () => {
 
     const { apiPost } = useApi();
+
+    const { oidcUser } = useOidcUser();
 
     const userList = useFetchArray<CSHUser>("/api/users");
 
@@ -67,7 +70,10 @@ const SubmitQuote = () => {
         }
     }
 
-    const canSubmit = () => quoteEntries.every(q => q.body.length > 0 && userList.map(u => u.uid.toLocaleLowerCase()).includes(extractUsername(q)));
+    const canSubmit = () => quoteEntries.every(q =>
+        q.body.length > 0
+        && userList.map(u => u.uid.toLocaleLowerCase()).includes(extractUsername(q))
+        && oidcUser.preferred_username !== extractUsername(q));
 
     const submit = () => {
         apiPost("/api/quote", {
