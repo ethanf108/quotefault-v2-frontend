@@ -20,7 +20,7 @@ const Profile = () => {
                     height={32}
                 />
 
-                <span className="ml-2 d-none d-md-inline">{oidcUser.name} ({oidcUser.preferred_username})</span>
+                <span className="ml-2">{oidcUser.name} ({oidcUser.preferred_username})</span>
 
             </DropdownToggle>
         </UncontrolledDropdown>

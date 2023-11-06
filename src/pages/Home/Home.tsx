@@ -1,6 +1,7 @@
 import { Card, Container } from "reactstrap";
 import Plug from "../../components/Plug";
 import SubmitQuote from "../../components/SubmitQuote";
+import GitFooter from "./GitFooter";
 
 const Home = () => {
     return (
@@ -9,6 +10,7 @@ const Home = () => {
                 <Plug />
             </Card>
             <SubmitQuote />
+            <GitFooter />
         </Container>
     )
 }

@@ -15,7 +15,7 @@ function App() {
             <Container className="main" fluid>
                 <NavBar />
                 <ToastContainer theme="colored" hideProgressBar newestOnTop className="py-5 my-5" autoClose={5000} />
-                <Container style={{ marginTop: "90px" }}>
+                <Container style={{ marginTop: "90px" }} className="px-0">
                     <Routes>
                         <Route path="/" element={<Home />} />
                         <Route path="/storage" element={<Storage storageType="STORAGE" />} />

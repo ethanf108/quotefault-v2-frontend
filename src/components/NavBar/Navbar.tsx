@@ -5,7 +5,6 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
 import { faDatabase, faFlag, faUser, faWarning } from "@fortawesome/free-solid-svg-icons";
 import { useOidcUser } from "@axa-fr/react-oidc";
 import { isEboardOrRTP } from "../../util";
-import GitNav from "./GitNav";
 
 const NavBar = () => {
 
@@ -15,17 +14,10 @@ const NavBar = () => {
 
     const toggle = () => setIsOpen(!isOpen);
 
-    const profile = (cn: string) => (
-        <Nav navbar className={cn}>
-            <Profile />
-        </Nav>
-    );
-
     return (
         <Navbar color="primary" dark expand="lg" fixed="top">
             <Container>
                 <NavLink href="/" className="navbar-brand" aria-hidden="true">Quotefault</NavLink>
-                {profile("d-md-none")}
                 <NavbarToggler onClick={toggle} />
                 <Collapse isOpen={isOpen} navbar>
                     <Nav navbar>
@@ -60,11 +52,10 @@ const NavBar = () => {
                             </>
                         }
                     </Nav>
+                    <Nav navbar className="ml-auto">
+                        <Profile />
+                    </Nav>
                 </Collapse>
-                <span className="d-none d-md-inline">
-                    <GitNav />
-                </span>
-                {profile("d-none d-md-inline")}
             </Container>
         </Navbar>
     )

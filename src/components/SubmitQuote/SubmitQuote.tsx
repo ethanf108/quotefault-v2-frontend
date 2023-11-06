@@ -3,7 +3,7 @@ import UserPicker from "../UserPicker";
 import { useState } from "react";
 import { ReactSortable } from "react-sortablejs";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faBars, faCircleMinus, faCirclePlus } from "@fortawesome/free-solid-svg-icons";
+import { faCircleMinus, faCirclePlus, faGrip } from "@fortawesome/free-solid-svg-icons";
 import { useApi, useFetchArray } from "../../API/API";
 import { CSHUser } from "../../API/Types";
 import { toast } from "react-toastify";
@@ -100,17 +100,20 @@ const SubmitQuote = () => {
             <CardBody>
                 <ReactSortable list={quoteEntries} setList={setQuoteEntries} handle=".grab-drag" >
                     {quoteEntries.map((q, i) =>
-                        <div key={i} className="d-flex align-items-center">
-                            <FontAwesomeIcon icon={faBars} className="fa-lg mr-4 grab-drag" />
-                            <Input
-                                className="mr-3"
-                                type="text"
-                                placeholder="Quote"
-                                value={q.body}
-                                onChange={e => changeQuoteText(q.id, e.target.value)}
-                            />
-                            <UserPicker value={q.speaker} onChange={e => changeQuoteUsername(q.id, e)} userList={userList} />
-                            <Button className="shadow-none" onClick={() => deleteQuoteEntry(q)} disabled={quoteEntries.length <= 1}>
+                        <div key={i} className="d-flex align-items-center w-100 mb-3">
+                            <FontAwesomeIcon icon={faGrip} className="fa-lg mr-4 grab-drag" title="Drag + Drop" />
+                            <div className="w-100">
+                                <Input
+                                    className="mr-3"
+                                    type="text"
+                                    placeholder="Quote"
+                                    value={q.body}
+                                    onChange={e => changeQuoteText(q.id, e.target.value)}
+                                />
+
+                                <UserPicker value={q.speaker} onChange={e => changeQuoteUsername(q.id, e)} userList={userList} />
+                            </div>
+                            <Button className="shadow-none" onClick={() => deleteQuoteEntry(q)} disabled={quoteEntries.length <= 1} title="Remove entry">
                                 <FontAwesomeIcon
                                     icon={faCircleMinus}
                                     className={`${quoteEntries.length > 1 && "text-danger"} flex-grow-1`}
@@ -120,12 +123,13 @@ const SubmitQuote = () => {
                     )}
                 </ReactSortable>
                 {quoteEntries.length < 6 &&
-                    <Button className="float-right my-2 shadow-none text-success" onClick={addQuoteEntry}>
-                        <FontAwesomeIcon icon={faCirclePlus} />
+                    <Button className="float-right my-2 shadow-none text-success" onClick={addQuoteEntry} title="Add entry">
+                        Add entry
+                        <FontAwesomeIcon icon={faCirclePlus} className="ml-3" />
                     </Button>
                 }
                 <Container className="d-flex px-0 pt-3">
-                    <Button disabled={!canSubmit()} onClick={submit} size="sm" color="primary" className="flex-grow-1">Submit</Button>
+                    <Button disabled={!canSubmit()} onClick={submit} color="primary" className="flex-grow-1">Submit</Button>
                 </Container>
             </CardBody>
         </Card >
