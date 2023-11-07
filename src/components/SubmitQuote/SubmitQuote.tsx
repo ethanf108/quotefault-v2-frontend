@@ -113,19 +113,18 @@ const SubmitQuote = () => {
 
                                 <UserPicker value={q.speaker} onChange={e => changeQuoteUsername(q.id, e)} userList={userList} />
                             </div>
-                            <Button className="shadow-none" onClick={() => deleteQuoteEntry(q)} disabled={quoteEntries.length <= 1} title="Remove entry">
+                            <Button className={"ml-3 shadow-none" + (quoteEntries.length <= 1 ? "" : " text-danger")} onClick={() => deleteQuoteEntry(q)} disabled={quoteEntries.length <= 1} title="Remove entry">
                                 <FontAwesomeIcon
                                     icon={faCircleMinus}
-                                    className={`${quoteEntries.length > 1 && "text-danger"} flex-grow-1`}
+                                    className="flex-grow-1"
                                 />
                             </Button>
                         </div>
                     )}
                 </ReactSortable>
                 {quoteEntries.length < 6 &&
-                    <Button className="float-right my-2 shadow-none text-success" onClick={addQuoteEntry} title="Add entry">
-                        Add entry
-                        <FontAwesomeIcon icon={faCirclePlus} className="ml-3" />
+                    <Button className="float-right my-2 shadow-none btn-success" onClick={addQuoteEntry} title="Add entry">
+                        <FontAwesomeIcon icon={faCirclePlus} />
                     </Button>
                 }
                 <Container className="d-flex px-0 pt-3">

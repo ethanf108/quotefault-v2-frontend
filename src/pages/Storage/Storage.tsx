@@ -2,14 +2,14 @@ import { useEffect, useState } from "react";
 import { Quote, Vote } from "../../API/Types";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { toastError, useApi } from "../../API/API";
-import { Button, Card, CardBody, Container, Input } from "reactstrap";
+import { Button, Card, CardBody, Container, DropdownItem, Input } from "reactstrap";
 import { toast } from "react-toastify";
 import QuoteCard from "../../components/QuoteCard/QuoteCard";
 import { useOidcUser } from "@axa-fr/react-oidc";
-import ConfirmDialog from "../../components/ConfirmDialog";
+import ConfirmModal from "../../components/ConfirmModal"
 import { isEboardOrRTP } from "../../util";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faFlag, faEyeSlash, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useSearchParams } from "react-router-dom";
 
 const pageSize = parseInt(process.env.QUOTEFAULT_STORAGE_PAGE_SIZE || "10");
@@ -38,6 +38,16 @@ const Storage = (props: Props) => {
     const [search, setSearch] = useState<string>("");
 
     const [searchQuery, setSearchQuery] = useState<string>("");
+
+    const [hideModal, setHideModal] = useState<boolean>(false);
+
+    const [deleteModal, setDeleteModal] = useState<boolean>(false);
+
+    const [reportModal, setReportModal] = useState<boolean>(false);
+
+    const [targetQuote, setTargetQuote] = useState<Quote | undefined>(undefined);
+
+    const [reportText, setReportText] = useState<string>("");
 
     const fetchQuotes = (quotes?: QuoteDict) => {
         if (!oidcUser) { return; }
@@ -97,7 +107,25 @@ const Storage = (props: Props) => {
         setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id));
     }
 
-    const reportQuote = (quote: Quote) => window.location.assign(`/report?id=${quote.id}`);
+    const reportQuote = (quote: Quote) =>
+        apiPost(`/api/quote/${quote?.id}/report`, {
+            reason: reportText
+        })
+        .then(() => toast.success("Submitted report!", { theme: "colored" }))
+        .catch(toastError("Failed to submit report"));
+
+    const confirmHide = (quote: Quote) => {
+      setTargetQuote(quote)
+      setHideModal(true);
+    }
+    const confirmDelete = (quote: Quote) => {
+      setTargetQuote(quote)
+      setDeleteModal(true);
+    }
+    const confirmReport = (quote: Quote) => {
+      setTargetQuote(quote)
+      setReportModal(true);
+    }
 
     const voteChange = (quote: Quote) => (action: Vote) => {
         switch (action) {
@@ -175,13 +203,23 @@ const Storage = (props: Props) => {
                         getQuotes().sort(sortQuotes).map((q, i) =>
                             <QuoteCard key={i} quote={q} onVoteChange={voteChange(q)}>
                                 {oidcUser.preferred_username === q.submitter.uid &&
-                                    <ConfirmDialog onClick={() => deleteQuote(q)} buttonClassName="btn-danger">Delete</ConfirmDialog>}
+                                    <DropdownItem onClick={() => confirmDelete(q)} className="text-danger">
+                                      <FontAwesomeIcon icon={faTrash} className="mr-2" fixedWidth/>
+                                      Delete
+                                    </DropdownItem>}
 
                                 {canHide(q)
-                                    && <ConfirmDialog onClick={() => hideQuote(q)} buttonClassName="btn-warning ml-1">Hide</ConfirmDialog>}
+                                    &&
+                                    <DropdownItem onClick={() => confirmHide(q)} className="text-warning">
+                                      <FontAwesomeIcon icon={faEyeSlash} className="mr-2" fixedWidth/>
+                                      Hide
+                                    </DropdownItem>}
 
                                 {props.storageType === "STORAGE" &&
-                                    <Button className="btn-danger ml-1" onClick={() => reportQuote(q)}>Report</Button>}
+                                    <DropdownItem onClick={() => confirmReport(q)} className="text-danger">
+                                      <FontAwesomeIcon icon={faFlag} className="mr-2" fixedWidth/>
+                                      Report
+                                    </DropdownItem>}
                             </QuoteCard>)
                     }
                     {
@@ -190,6 +228,42 @@ const Storage = (props: Props) => {
                         </div>
                     }
                     {canBeFunny() && <div className="text-center mb-3">How did you read ALL of the quotes lol</div>}
+                    <ConfirmModal
+                      onConfirm={() => targetQuote && deleteQuote(targetQuote)}
+                      isOpen={deleteModal}
+                      toggle={() => setDeleteModal(!deleteModal)}
+                      color="danger"
+                      headerText="Are you sure you want to delete this quote?"
+                      confirmText="Delete"
+                    >
+                      <QuoteCard quote={targetQuote!}/>
+                    </ConfirmModal>
+                    <ConfirmModal
+                      onConfirm={() => targetQuote && hideQuote(targetQuote)}
+                      isOpen={hideModal}
+                      toggle={() => setHideModal(!hideModal)}
+                      color="warning"
+                      headerText="Are you sure you want to hide this quote?"
+                      confirmText="Hide"
+                    >
+                      <QuoteCard quote={targetQuote!}/>
+                    </ConfirmModal>
+                    <ConfirmModal
+                      onConfirm={() => targetQuote && reportQuote(targetQuote)}
+                      isOpen={reportModal}
+                      toggle={() => setReportModal(!reportModal)}
+                      color="primary"
+                      headerText="Why do you want to report this Quote?"
+                      confirmText="Report"
+                    >
+                      <QuoteCard quote={targetQuote!}/>
+                      <Input
+                          type="text"
+                          placeholder="Why do you want to report this Quote?"
+                          value={reportText}
+                          onChange={e => setReportText(e.target.value)}
+                      />
+                    </ConfirmModal>
                 </Container>
             </InfiniteScroll>
         </Container>

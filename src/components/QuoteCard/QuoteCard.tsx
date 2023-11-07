@@ -1,18 +1,21 @@
-import { Card, CardBody, CardFooter } from "reactstrap";
+import { Card, CardBody, CardFooter, Dropdown, DropdownMenu, DropdownToggle } from "reactstrap";
 import { Quote, Vote, formatUser } from "../../API/Types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { ReactNode, useEffect, useState } from "react";
 
 interface Props {
     quote: Quote,
     onVoteChange?: (type: Vote) => void,
-    children?: ReactNode,
+    children?: ReactNode[],
 }
 
 const QuoteCard = (props: Props) => {
 
     const [vote, setVote] = useState<Vote>(null);
+    const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+
+    const toggleDropdownOpen = () => setDropdownOpen((prevState) => !prevState);
 
     const updateVote = (state: Vote) => {
         props.onVoteChange!(state);
@@ -60,9 +63,17 @@ const QuoteCard = (props: Props) => {
                     </a>
                     &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
                 </p>
-                <span className="float-right">
-                    {props.children}
-                </span>
+                
+                {props.children && props.children.length > 0 &&
+                  <Dropdown isOpen={dropdownOpen} toggle={toggleDropdownOpen} className="float-right">
+                    <DropdownToggle className="shadow-none" style={{background: "none"}}>
+                      <FontAwesomeIcon icon={faEllipsis} />
+                    </DropdownToggle>
+                    <DropdownMenu>
+                      {props.children}
+                    </DropdownMenu>
+                  </Dropdown>
+                }
             </CardFooter>
         </Card>
     )
