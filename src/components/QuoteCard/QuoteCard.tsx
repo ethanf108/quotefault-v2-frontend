@@ -56,24 +56,26 @@ const QuoteCard = (props: Props) => {
                 }
             </CardBody>
             <CardFooter>
-                <p className="float-left">
-                    Submitted By &nbsp;
-                    <a href={`/personal?involved=${props.quote.submitter.uid}`} className="text-primary">
-                        <b>{formatUser(props.quote.submitter)}</b>
-                    </a>
-                    &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
-                </p>
+                <div className="d-flex">
+                  <p className="float-left flex-grow-1">
+                      Submitted By &nbsp;
+                      <a href={`/personal?involved=${props.quote.submitter.uid}`} className="text-primary">
+                          <b>{formatUser(props.quote.submitter)}</b>
+                      </a>
+                      &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
+                  </p>
                 
-                {props.children && props.children.length > 0 &&
-                  <Dropdown isOpen={dropdownOpen} toggle={toggleDropdownOpen} className="float-right">
-                    <DropdownToggle className="shadow-none" style={{background: "none"}}>
-                      <FontAwesomeIcon icon={faEllipsis} />
-                    </DropdownToggle>
-                    <DropdownMenu>
-                      {props.children}
-                    </DropdownMenu>
-                  </Dropdown>
-                }
+                  {props.children && props.children.length > 0 &&
+                    <Dropdown isOpen={dropdownOpen} toggle={toggleDropdownOpen} className="float-right">
+                      <DropdownToggle className="shadow-none" style={{background: "none"}}>
+                        <FontAwesomeIcon icon={faEllipsis} />
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        {props.children}
+                      </DropdownMenu>
+                    </Dropdown>
+                  }
+                </div>
             </CardFooter>
         </Card>
     )
