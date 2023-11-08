@@ -12,7 +12,7 @@ function App() {
 
     return (
         <BrowserRouter>
-            <Container className="main" fluid>
+            <Container className="main px-0" fluid>
                 <NavBar />
                 <ToastContainer theme="colored" hideProgressBar newestOnTop className="py-5 my-5" autoClose={5000} />
                 <Container style={{ marginTop: "90px" }} className="px-0">

@@ -178,9 +178,9 @@ const Storage = (props: Props) => {
     })();
 
     return (
-        <Container>
-            <Card>
-                <CardBody className="d-flex py-1">
+        <Container className="px-0">
+            <Card className="mx-3">
+                <CardBody className="d-flex py-1 px-1">
                     <Input type="text" placeholder="Search" className="mx-2" value={search} onChange={e => setSearch(e.target.value)} />
                     <Button className="btn-sm shadow-none btn-info d-flex align-items-center" onClick={() => setSearchQuery(search)}>
                         <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2 py-0" />
