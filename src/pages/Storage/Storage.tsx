@@ -203,20 +203,20 @@ const Storage = (props: Props) => {
                         getQuotes().sort(sortQuotes).map((q, i) =>
                             <QuoteCard key={i} quote={q} onVoteChange={voteChange(q)}>
                                 {oidcUser.preferred_username === q.submitter.uid &&
-                                    <DropdownItem onClick={() => confirmDelete(q)} className="text-danger">
+                                    <DropdownItem onClick={() => confirmDelete(q)} className="btn-danger shadow-none">
                                       <FontAwesomeIcon icon={faTrash} className="mr-2" fixedWidth/>
                                       Delete
                                     </DropdownItem>}
 
                                 {canHide(q)
                                     &&
-                                    <DropdownItem onClick={() => confirmHide(q)} className="text-warning">
+                                    <DropdownItem onClick={() => confirmHide(q)} className="btn-warning shadow-none">
                                       <FontAwesomeIcon icon={faEyeSlash} className="mr-2" fixedWidth/>
                                       Hide
                                     </DropdownItem>}
 
                                 {props.storageType === "STORAGE" &&
-                                    <DropdownItem onClick={() => confirmReport(q)} className="text-danger">
+                                    <DropdownItem onClick={() => confirmReport(q)} className="btn-danger shadow-none">
                                       <FontAwesomeIcon icon={faFlag} className="mr-2" fixedWidth/>
                                       Report
                                     </DropdownItem>}
