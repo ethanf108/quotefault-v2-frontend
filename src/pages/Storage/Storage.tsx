@@ -18,6 +18,16 @@ interface Props {
     storageType: "STORAGE" | "HIDDEN" | "SELF",
 }
 
+interface ModalProps {
+    quote: Quote,
+    confirmAction: (quote: Quote) => void,
+    isOpen: boolean,
+    color: string,
+    headerText: string,
+    confirmText: string,
+    showReportInput?: boolean,
+}
+
 type QuoteDict = { [key: number]: Quote };
 
 const Storage = (props: Props) => {
@@ -39,13 +49,8 @@ const Storage = (props: Props) => {
 
     const [searchQuery, setSearchQuery] = useState<string>("");
 
-    const [hideModal, setHideModal] = useState<boolean>(false);
 
-    const [deleteModal, setDeleteModal] = useState<boolean>(false);
-
-    const [reportModal, setReportModal] = useState<boolean>(false);
-
-    const [targetQuote, setTargetQuote] = useState<Quote | undefined>(undefined);
+    const [modalState, setModalState] = useState<ModalProps | null>(null);
 
     const [reportText, setReportText] = useState<string>("");
 
@@ -115,16 +120,35 @@ const Storage = (props: Props) => {
         .catch(toastError("Failed to submit report"));
 
     const confirmHide = (quote: Quote) => {
-      setTargetQuote(quote)
-      setHideModal(true);
+        setModalState({
+            confirmText: "Hide",
+            color: "warning",
+            isOpen: true,
+            headerText: "Are you sure you want to hide this quote?",
+            quote: quote,
+            confirmAction: hideQuote,
+        })
     }
     const confirmDelete = (quote: Quote) => {
-      setTargetQuote(quote)
-      setDeleteModal(true);
+        setModalState({
+            confirmText: "Delete",
+            color: "danger",
+            isOpen: true,
+            headerText: "Are you sure you want to delete this quote?",
+            quote: quote,
+            confirmAction: deleteQuote,
+        })
     }
     const confirmReport = (quote: Quote) => {
-      setTargetQuote(quote)
-      setReportModal(true);
+        setModalState({
+            confirmText: "Report",
+            color: "primary",
+            isOpen: true,
+            headerText: "Why do you want to report this Quote?",
+            quote: quote,
+            confirmAction: reportQuote,
+            showReportInput: true,
+        })
     }
 
     const voteChange = (quote: Quote) => (action: Vote) => {
@@ -228,42 +252,26 @@ const Storage = (props: Props) => {
                         </div>
                     }
                     {canBeFunny() && <div className="text-center mb-3">How did you read ALL of the quotes lol</div>}
-                    <ConfirmModal
-                      onConfirm={() => targetQuote && deleteQuote(targetQuote)}
-                      isOpen={deleteModal}
-                      toggle={() => setDeleteModal(!deleteModal)}
-                      color="danger"
-                      headerText="Are you sure you want to delete this quote?"
-                      confirmText="Delete"
-                    >
-                      <QuoteCard quote={targetQuote!}/>
-                    </ConfirmModal>
-                    <ConfirmModal
-                      onConfirm={() => targetQuote && hideQuote(targetQuote)}
-                      isOpen={hideModal}
-                      toggle={() => setHideModal(!hideModal)}
-                      color="warning"
-                      headerText="Are you sure you want to hide this quote?"
-                      confirmText="Hide"
-                    >
-                      <QuoteCard quote={targetQuote!}/>
-                    </ConfirmModal>
-                    <ConfirmModal
-                      onConfirm={() => targetQuote && reportQuote(targetQuote)}
-                      isOpen={reportModal}
-                      toggle={() => setReportModal(!reportModal)}
-                      color="primary"
-                      headerText="Why do you want to report this Quote?"
-                      confirmText="Report"
-                    >
-                      <QuoteCard quote={targetQuote!}/>
-                      <Input
-                          type="text"
-                          placeholder="Why do you want to report this Quote?"
-                          value={reportText}
-                          onChange={e => setReportText(e.target.value)}
-                      />
-                    </ConfirmModal>
+                    { modalState &&
+                        <ConfirmModal
+                            onConfirm={() => modalState.confirmAction(modalState.quote)}
+                            isOpen={modalState.isOpen}
+                            headerText={modalState.headerText}
+                            toggle={() => setModalState({...modalState, isOpen: !modalState.isOpen})}
+                            color={modalState.color}
+                            confirmText={modalState.confirmText}
+                        >
+                            <QuoteCard quote={modalState.quote}/>
+                            { modalState.showReportInput &&
+                                <Input
+                                    type="text"
+                                    placeholder="Why do you want to report this Quote?"
+                                    value={reportText}
+                                    onChange={e => setReportText(e.target.value)}
+                                />
+                            }
+                        </ConfirmModal>
+                    }
                 </Container>
             </InfiniteScroll>
         </Container>
