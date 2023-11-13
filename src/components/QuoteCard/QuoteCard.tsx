@@ -7,7 +7,7 @@ import { ReactNode, useEffect, useState } from "react";
 interface Props {
     quote: Quote,
     onVoteChange?: (type: Vote) => void,
-    children?: ReactNode[],
+    children?: ReactNode,
 }
 
 const QuoteCard = (props: Props) => {
@@ -65,7 +65,7 @@ const QuoteCard = (props: Props) => {
                       &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
                   </p>
                 
-                  {props.children && props.children.length > 0 &&
+                  {props.children &&
                     <Dropdown isOpen={dropdownOpen} toggle={toggleDropdownOpen} className="float-right">
                       <DropdownToggle className="shadow-none" style={{background: "none"}}>
                         <FontAwesomeIcon icon={faEllipsis} />

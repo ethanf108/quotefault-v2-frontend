@@ -1,6 +1,5 @@
 import { PropsWithChildren } from "react";
 import { Button, Modal, ModalBody, ModalFooter, ModalHeader } from "reactstrap";
-import { Quote } from "../../API/Types";
 
 interface ConfirmModalProps extends PropsWithChildren {
     onConfirm: () => void,
@@ -10,7 +9,6 @@ interface ConfirmModalProps extends PropsWithChildren {
     color?: string,
     isOpen: boolean,
     toggle: () => void,
-    quote?: Quote,
 }
 
 const ConfirmModal = (props: ConfirmModalProps) => {
