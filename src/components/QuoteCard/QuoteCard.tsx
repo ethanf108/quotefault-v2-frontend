@@ -1,7 +1,7 @@
-import { Card, CardBody, CardFooter } from "reactstrap";
+import { Card, CardBody, CardFooter, Dropdown, DropdownMenu, DropdownToggle } from "reactstrap";
 import { Quote, Vote, formatUser } from "../../API/Types";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp } from "@fortawesome/free-solid-svg-icons";
+import { faCaretDown, faCaretUp, faSquareCaretDown, faSquareCaretUp, faEllipsis } from "@fortawesome/free-solid-svg-icons";
 import { ReactNode, useEffect, useState } from "react";
 
 interface Props {
@@ -13,6 +13,9 @@ interface Props {
 const QuoteCard = (props: Props) => {
 
     const [vote, setVote] = useState<Vote>(null);
+    const [dropdownOpen, setDropdownOpen] = useState<boolean>(false);
+
+    const toggleDropdownOpen = () => setDropdownOpen((prevState) => !prevState);
 
     const updateVote = (state: Vote) => {
         props.onVoteChange!(state);
@@ -53,16 +56,26 @@ const QuoteCard = (props: Props) => {
                 }
             </CardBody>
             <CardFooter>
-                <p className="float-left">
-                    Submitted By &nbsp;
-                    <a href={`/personal?involved=${props.quote.submitter.uid}`} className="text-primary">
-                        <b>{formatUser(props.quote.submitter)}</b>
-                    </a>
-                    &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
-                </p>
-                <span className="float-right">
-                    {props.children}
-                </span>
+                <div className="d-flex">
+                  <p className="float-left flex-grow-1">
+                      Submitted By &nbsp;
+                      <a href={`/personal?involved=${props.quote.submitter.uid}`} className="text-primary">
+                          <b>{formatUser(props.quote.submitter)}</b>
+                      </a>
+                      &nbsp; on {new Date(props.quote.timestamp).toLocaleString().replace(", ", " at ")}
+                  </p>
+                
+                  {props.children &&
+                    <Dropdown isOpen={dropdownOpen} toggle={toggleDropdownOpen} className="float-right">
+                      <DropdownToggle className="shadow-none" style={{background: "none"}}>
+                        <FontAwesomeIcon icon={faEllipsis} />
+                      </DropdownToggle>
+                      <DropdownMenu>
+                        {props.children}
+                      </DropdownMenu>
+                    </Dropdown>
+                  }
+                </div>
             </CardFooter>
         </Card>
     )

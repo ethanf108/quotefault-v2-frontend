@@ -13,7 +13,7 @@ const GitFooter = () => {
 
     return (
         <div className="mt-3 text-center">
-            <p className="text-monospace">
+            <p className="text-monospace d-inline mx-2">
                 <a href={`${frontendGitCommitURL}/tree/${frontendGitCommitHash}`} rel="noopener" target="_blank">
                     <FontAwesomeIcon icon={faCodeBranch} />
                     <span className="mx-1">Frontend</span>
@@ -22,7 +22,7 @@ const GitFooter = () => {
             </p>
 
             {backendGit &&
-                <p className="text-monospace">
+                <p className="text-monospace d-inline mx-2">
                     <a href={`${backendGit.url}/tree/${backendGit.revision}`} rel="noopener" target="_blank">
                         <FontAwesomeIcon icon={faCodeBranch} />
                         <span className="mx-1">Backend</span>

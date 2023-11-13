@@ -1,1 +1,20 @@
+.dropdown-item.btn-danger {
+  color: var(--danger);
+  text-decoration: none;
+  background: none;
+  outline: none;
+}
+.dropdown-item.btn-danger:active {
+  background: var(--danger) !important;
+}
 
+
+.dropdown-item.btn-warning {
+  color: var(--warning);
+  text-decoration: none;
+  background: none;
+  outline: none;
+}
+.dropdown-item.btn-warning:active {
+  background: var(--warning) !important;
+}

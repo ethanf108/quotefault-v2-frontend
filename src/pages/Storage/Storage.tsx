@@ -2,20 +2,30 @@ import { useEffect, useState } from "react";
 import { Quote, Vote } from "../../API/Types";
 import InfiniteScroll from "react-infinite-scroll-component";
 import { toastError, useApi } from "../../API/API";
-import { Button, Card, CardBody, Container, Input } from "reactstrap";
+import { Button, Card, CardBody, Container, DropdownItem, Input } from "reactstrap";
 import { toast } from "react-toastify";
 import QuoteCard from "../../components/QuoteCard/QuoteCard";
 import { useOidcUser } from "@axa-fr/react-oidc";
-import ConfirmDialog from "../../components/ConfirmDialog";
+import ConfirmModal from "../../components/ConfirmModal"
 import { isEboardOrRTP } from "../../util";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass } from "@fortawesome/free-solid-svg-icons";
+import { faMagnifyingGlass, faFlag, faEyeSlash, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useSearchParams } from "react-router-dom";
 
 const pageSize = parseInt(process.env.QUOTEFAULT_STORAGE_PAGE_SIZE || "10");
 
 interface Props {
     storageType: "STORAGE" | "HIDDEN" | "SELF",
+}
+
+interface ModalProps {
+    quote: Quote,
+    confirmAction: (quote: Quote) => void,
+    isOpen: boolean,
+    color: string,
+    headerText: string,
+    confirmText: string,
+    showReportInput?: boolean,
 }
 
 type QuoteDict = { [key: number]: Quote };
@@ -38,6 +48,11 @@ const Storage = (props: Props) => {
     const [search, setSearch] = useState<string>("");
 
     const [searchQuery, setSearchQuery] = useState<string>("");
+
+
+    const [modalState, setModalState] = useState<ModalProps | null>(null);
+
+    const [reportText, setReportText] = useState<string>("");
 
     const fetchQuotes = (quotes?: QuoteDict) => {
         if (!oidcUser) { return; }
@@ -97,7 +112,44 @@ const Storage = (props: Props) => {
         setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id));
     }
 
-    const reportQuote = (quote: Quote) => window.location.assign(`/report?id=${quote.id}`);
+    const reportQuote = (quote: Quote) =>
+        apiPost(`/api/quote/${quote?.id}/report`, {
+            reason: reportText
+        })
+        .then(() => toast.success("Submitted report!", { theme: "colored" }))
+        .catch(toastError("Failed to submit report"));
+
+    const confirmHide = (quote: Quote) => {
+        setModalState({
+            confirmText: "Hide",
+            color: "warning",
+            isOpen: true,
+            headerText: "Are you sure you want to hide this quote?",
+            quote: quote,
+            confirmAction: hideQuote,
+        })
+    }
+    const confirmDelete = (quote: Quote) => {
+        setModalState({
+            confirmText: "Delete",
+            color: "danger",
+            isOpen: true,
+            headerText: "Are you sure you want to delete this quote?",
+            quote: quote,
+            confirmAction: deleteQuote,
+        })
+    }
+    const confirmReport = (quote: Quote) => {
+        setModalState({
+            confirmText: "Report",
+            color: "primary",
+            isOpen: true,
+            headerText: "Why do you want to report this Quote?",
+            quote: quote,
+            confirmAction: reportQuote,
+            showReportInput: true,
+        })
+    }
 
     const voteChange = (quote: Quote) => (action: Vote) => {
         switch (action) {
@@ -150,9 +202,9 @@ const Storage = (props: Props) => {
     })();
 
     return (
-        <Container>
-            <Card>
-                <CardBody className="d-flex py-1">
+        <Container className="px-0">
+            <Card className="mx-3">
+                <CardBody className="d-flex py-1 px-1">
                     <Input type="text" placeholder="Search" className="mx-2" value={search} onChange={e => setSearch(e.target.value)} />
                     <Button className="btn-sm shadow-none btn-info d-flex align-items-center" onClick={() => setSearchQuery(search)}>
                         <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2 py-0" />
@@ -175,13 +227,23 @@ const Storage = (props: Props) => {
                         getQuotes().sort(sortQuotes).map((q, i) =>
                             <QuoteCard key={i} quote={q} onVoteChange={voteChange(q)}>
                                 {oidcUser.preferred_username === q.submitter.uid &&
-                                    <ConfirmDialog onClick={() => deleteQuote(q)} buttonClassName="btn-danger">Delete</ConfirmDialog>}
+                                    <DropdownItem onClick={() => confirmDelete(q)} className="btn-danger shadow-none">
+                                      <FontAwesomeIcon icon={faTrash} className="mr-2" fixedWidth/>
+                                      Delete
+                                    </DropdownItem>}
 
                                 {canHide(q)
-                                    && <ConfirmDialog onClick={() => hideQuote(q)} buttonClassName="btn-warning ml-1">Hide</ConfirmDialog>}
+                                    &&
+                                    <DropdownItem onClick={() => confirmHide(q)} className="btn-warning shadow-none">
+                                      <FontAwesomeIcon icon={faEyeSlash} className="mr-2" fixedWidth/>
+                                      Hide
+                                    </DropdownItem>}
 
                                 {props.storageType === "STORAGE" &&
-                                    <Button className="btn-danger ml-1" onClick={() => reportQuote(q)}>Report</Button>}
+                                    <DropdownItem onClick={() => confirmReport(q)} className="btn-danger shadow-none">
+                                      <FontAwesomeIcon icon={faFlag} className="mr-2" fixedWidth/>
+                                      Report
+                                    </DropdownItem>}
                             </QuoteCard>)
                     }
                     {
@@ -190,6 +252,26 @@ const Storage = (props: Props) => {
                         </div>
                     }
                     {canBeFunny() && <div className="text-center mb-3">How did you read ALL of the quotes lol</div>}
+                    { modalState &&
+                        <ConfirmModal
+                            onConfirm={() => modalState.confirmAction(modalState.quote)}
+                            isOpen={modalState.isOpen}
+                            headerText={modalState.headerText}
+                            toggle={() => setModalState({...modalState, isOpen: !modalState.isOpen})}
+                            color={modalState.color}
+                            confirmText={modalState.confirmText}
+                        >
+                            <QuoteCard quote={modalState.quote}/>
+                            { modalState.showReportInput &&
+                                <Input
+                                    type="text"
+                                    placeholder="Why do you want to report this Quote?"
+                                    value={reportText}
+                                    onChange={e => setReportText(e.target.value)}
+                                />
+                            }
+                        </ConfirmModal>
+                    }
                 </Container>
             </InfiniteScroll>
         </Container>
