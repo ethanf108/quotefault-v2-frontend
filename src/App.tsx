@@ -33,7 +33,7 @@ function App() {
                         />
                         <Route
                             path="/personal"
-                            element={<Storage storageType="SELF" />}
+                            element={<Storage storageType="PERSONAL" />}
                         />
                         <Route path="/report" element={<SubmitReport />} />
                         <Route path="/reports" element={<Reports />} />

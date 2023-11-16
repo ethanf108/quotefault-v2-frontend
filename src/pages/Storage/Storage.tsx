@@ -22,7 +22,7 @@ import { Badge, Button, Container, DropdownItem, Input } from "reactstrap"
 const pageSize = parseInt(process.env.QUOTEFAULT_STORAGE_PAGE_SIZE || "10")
 
 interface Props {
-    storageType: "STORAGE" | "HIDDEN" | "SELF"
+    storageType: "STORAGE" | "HIDDEN" | "PERSONAL"
 }
 
 interface ModalProps {
@@ -73,7 +73,7 @@ const Storage = (props: Props) => {
                 { id: 0 }
             ).id,
             limit: pageSize,
-            ...(props.storageType !== "SELF"
+            ...(props.storageType !== "PERSONAL"
                 ? { hidden: props.storageType === "HIDDEN" }
                 : { involved: oidcUser.preferred_username }),
             ...searchParams
@@ -229,6 +229,10 @@ const Storage = (props: Props) => {
                     </p>
                 ))}
             </span>
+
+            <h1 className="mb-4" style={{ textTransform: "capitalize" }}>
+                {props.storageType.toLocaleLowerCase()}
+            </h1>
 
             <InfiniteScroll
                 dataLength={getQuotes().length}
