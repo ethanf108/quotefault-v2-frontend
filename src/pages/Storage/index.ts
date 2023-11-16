@@ -1,9 +1,9 @@
-import Storage from "./Storage";
+import Storage from "./Storage"
 
 export interface SearchParam {
-    name: string,
-    param: string,
-    username: boolean,
+    name: string
+    param: string
+    username: boolean
 }
 
 export const searchParams: SearchParam[] = [
@@ -27,23 +27,22 @@ export const searchParams: SearchParam[] = [
         name: "Speaker",
         username: true,
     },
-];
+]
 
 export const assignParams = (dict: { [param: string]: string }) => {
-    const href = new URL(window.location.href);
+    const href = new URL(window.location.href)
     for (const key in dict) {
-        href.searchParams.set(key, dict[key]);
+        href.searchParams.set(key, dict[key])
     }
-    window.location.assign(href);
+    window.location.assign(href)
 }
 
 export const deleteParams = (...params: string[]) => {
-    const href = new URL(window.location.href);
+    const href = new URL(window.location.href)
     for (const key of params) {
-        href.searchParams.delete(key);
+        href.searchParams.delete(key)
     }
-    window.location.assign(href);
-
+    window.location.assign(href)
 }
 
-export default Storage;
+export default Storage

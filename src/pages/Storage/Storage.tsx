@@ -1,120 +1,141 @@
-import { useEffect, useState } from "react";
-import { CSHUser, Quote, Vote } from "../../API/Types";
-import InfiniteScroll from "react-infinite-scroll-component";
-import { toastError, useApi, useFetchArray } from "../../API/API";
-import { toast } from "react-toastify";
-import QuoteCard from "../../components/QuoteCard/QuoteCard";
-import { useOidcUser } from "@axa-fr/react-oidc";
+import { useEffect, useState } from "react"
+import { CSHUser, Quote, Vote } from "../../API/Types"
+import InfiniteScroll from "react-infinite-scroll-component"
+import { toastError, useApi, useFetchArray } from "../../API/API"
+import { toast } from "react-toastify"
+import QuoteCard from "../../components/QuoteCard/QuoteCard"
+import { useOidcUser } from "@axa-fr/react-oidc"
 import ConfirmModal from "../../components/ConfirmModal"
-import { isEboardOrRTP } from "../../util";
-import { useSearchParams } from "react-router-dom";
-import Search from "./Search";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faEyeSlash, faFlag, faTrash, faX } from "@fortawesome/free-solid-svg-icons";
-import { deleteParams, searchParams } from ".";
-import { Badge, Button, Container, DropdownItem, Input } from "reactstrap";
+import { isEboardOrRTP } from "../../util"
+import { useSearchParams } from "react-router-dom"
+import Search from "./Search"
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
+import {
+    faEyeSlash,
+    faFlag,
+    faTrash,
+    faX,
+} from "@fortawesome/free-solid-svg-icons"
+import { deleteParams, searchParams } from "."
+import { Badge, Button, Container, DropdownItem, Input } from "reactstrap"
 
-const pageSize = parseInt(process.env.QUOTEFAULT_STORAGE_PAGE_SIZE || "10");
+const pageSize = parseInt(process.env.QUOTEFAULT_STORAGE_PAGE_SIZE || "10")
 
 interface Props {
-    storageType: "STORAGE" | "HIDDEN" | "SELF",
+    storageType: "STORAGE" | "HIDDEN" | "SELF"
 }
 
 interface ModalProps {
-    quote: Quote,
-    confirmAction: (quote: Quote) => void,
-    isOpen: boolean,
-    color: string,
-    headerText: string,
-    confirmText: string,
-    showReportInput?: boolean,
+    quote: Quote
+    confirmAction: (quote: Quote) => void
+    isOpen: boolean
+    color: string
+    headerText: string
+    confirmText: string
+    showReportInput?: boolean
 }
 
-type QuoteDict = { [key: number]: Quote };
+type QuoteDict = { [key: number]: Quote }
 
 const Storage = (props: Props) => {
+    const { oidcUser } = useOidcUser()
 
-    const { oidcUser } = useOidcUser();
+    const [queryParams] = useSearchParams()
 
-    const [queryParams] = useSearchParams();
+    const getParam = (key: string): string | null =>
+        queryParams.has(key) ? queryParams.get(key) || null : null
 
-    const getParam = (key: string): string | null => queryParams.has(key) ? queryParams.get(key) || null : null;
+    const { apiGet, apiPut, apiDelete, apiPost } = useApi()
 
-    const { apiGet, apiPut, apiDelete, apiPost } = useApi();
+    const userList = useFetchArray<CSHUser>("/api/users")
 
-    const userList = useFetchArray<CSHUser>("/api/users");
+    const [quotes, setQuotes] = useState<QuoteDict>([])
 
-    const [quotes, setQuotes] = useState<QuoteDict>([]);
+    const getQuotes = (q?: QuoteDict) => Object.values(q || quotes)
 
-    const getQuotes = (q?: QuoteDict) => Object.values(q || quotes);
+    const [isMore, setIsMore] = useState<boolean>(true)
 
-    const [isMore, setIsMore] = useState<boolean>(true);
+    const [modalState, setModalState] = useState<ModalProps | null>(null)
 
-    const [modalState, setModalState] = useState<ModalProps | null>(null);
-
-    const [reportText, setReportText] = useState<string>("");
+    const [reportText, setReportText] = useState<string>("")
 
     const fetchQuotes = (quotes?: QuoteDict) => {
-        if (!oidcUser) { return; }
+        if (!oidcUser) {
+            return
+        }
 
-        const getVar = (name: string) => (getParam(name) ? { [name]: getParam(name) } : {});
+        const getVar = (name: string) =>
+            getParam(name) ? { [name]: getParam(name) } : {}
 
         apiGet<Quote[]>("/api/quotes", {
-            lt: getQuotes(quotes).reduce((a, b) => a.id < b.id && a.id != 0 ? a : b, { id: 0 }).id,
+            lt: getQuotes(quotes).reduce(
+                (a, b) => (a.id < b.id && a.id != 0 ? a : b),
+                { id: 0 }
+            ).id,
             limit: pageSize,
-            ...(props.storageType !== "SELF" ? { hidden: props.storageType === "HIDDEN" } : { involved: oidcUser.preferred_username }),
-            ...searchParams.map(s => getVar(s.param)).reduce((a, b) => ({ ...a, ...b }))
+            ...(props.storageType !== "SELF"
+                ? { hidden: props.storageType === "HIDDEN" }
+                : { involved: oidcUser.preferred_username }),
+            ...searchParams
+                .map(s => getVar(s.param))
+                .reduce((a, b) => ({ ...a, ...b })),
         })
             .then(q => {
                 if (q.length < pageSize) {
-                    setIsMore(false);
+                    setIsMore(false)
                 }
-                return q;
+                return q
             })
-            .then(qs => setQuotes(quotes => ({
-                ...qs.map(q => ({ [q.id]: q })).reduce((a, b) => ({ ...a, ...b }), {}),
-                ...quotes,
-            })))
+            .then(qs =>
+                setQuotes(quotes => ({
+                    ...qs
+                        .map(q => ({ [q.id]: q }))
+                        .reduce((a, b) => ({ ...a, ...b }), {}),
+                    ...quotes,
+                }))
+            )
             .catch(toastError("Error fetching Quotes"))
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    useEffect(fetchQuotes, [oidcUser]);
+    useEffect(fetchQuotes, [oidcUser])
 
     const updateQuote = (id: number) =>
         apiGet<Quote>(`/api/quote/${id}`)
-            .then(q => setQuotes(getQuotes().map(o => o.id === q.id ? q : o)))
-            .catch(toastError("Failed to update quote"));
-
+            .then(q => setQuotes(getQuotes().map(o => (o.id === q.id ? q : o))))
+            .catch(toastError("Failed to update quote"))
 
     const canHide = (q: Quote) =>
-        props.storageType !== "HIDDEN"
-        && !q.hidden
-        && (isEboardOrRTP(oidcUser)
-            || q.shards.map(s => s.speaker.uid).includes(oidcUser.preferred_username || ""));
-
+        props.storageType !== "HIDDEN" &&
+        !q.hidden &&
+        (isEboardOrRTP(oidcUser) ||
+            q.shards
+                .map(s => s.speaker.uid)
+                .includes(oidcUser.preferred_username || ""))
 
     const deleteQuote = (quote: Quote) => {
         apiDelete(`/api/quote/${quote.id}`)
             .then(() => toast.success("Deleted Quote!", { theme: "colored" }))
             .then(() => setQuotes(getQuotes().filter(q => q.id !== quote.id)))
-            .catch(toastError("Failed to delete quote"));
-        setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id));
+            .catch(toastError("Failed to delete quote"))
+        setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id))
     }
 
     const hideQuote = (quote: Quote) => {
         apiPut(`/api/quote/${quote.id}/hide`)
             .then(() => setQuotes(getQuotes().filter(q => q.id !== quote.id)))
-            .catch(toastError("Failed to hide quote"));
-        setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id));
+            .catch(toastError("Failed to hide quote"))
+        setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id))
     }
 
     const reportQuote = (quote: Quote) =>
         apiPost(`/api/quote/${quote?.id}/report`, {
-            reason: reportText
+            reason: reportText,
         })
-            .then(() => toast.success("Submitted report!", { theme: "colored" }))
-            .catch(toastError("Failed to submit report"));
+            .then(() =>
+                toast.success("Submitted report!", { theme: "colored" })
+            )
+            .catch(toastError("Failed to submit report"))
 
     const confirmHide = (quote: Quote) => {
         setModalState({
@@ -154,10 +175,12 @@ const Storage = (props: Props) => {
                 apiDelete(`/api/quote/${quote.id}/vote`)
                     .then(() => updateQuote(quote.id))
                     .catch(toastError("Failed to alter vote"))
-                break;
+                break
             }
             default: {
-                apiPost(`/api/quote/${quote.id}/vote`, undefined, { vote: action })
+                apiPost(`/api/quote/${quote.id}/vote`, undefined, {
+                    vote: action,
+                })
                     .then(() => updateQuote(quote.id))
                     .catch(toastError("Failed to alter vote"))
             }
@@ -165,109 +188,147 @@ const Storage = (props: Props) => {
     }
 
     const sortQuotes = (a: Quote, b: Quote) =>
-        ((a, b) => b.getTime() - a.getTime())(new Date(a.timestamp), new Date(b.timestamp));
+        ((a, b) => b.getTime() - a.getTime())(
+            new Date(a.timestamp),
+            new Date(b.timestamp)
+        )
 
-    const canBeFunny = () => !isMore && !getParam("q") && props.storageType === "STORAGE";
+    const canBeFunny = () =>
+        !isMore && !getParam("q") && props.storageType === "STORAGE"
 
-    const searchBadges = searchParams.filter(q => getParam(q.param));
+    const searchBadges = searchParams.filter(q => getParam(q.param))
 
     return (
         <Container>
-
             <Search userList={userList} />
 
             <span className="d-flex my-3">
-                {
-                    searchBadges.map((q, i) =>
-                        <p key={i} className="d-inline h5">
-                            <Badge color="light" className="mr-2 text-dark font-weight-normal p-2 my-1">
-                                <b>{q.name}</b>:&nbsp;
-                                {(s => q.username ? userList.filter(u => u.uid === s).map(u => `${u.cn} (${u.uid})`)[0] ?? s : s)(getParam(q.param))}
-                                <Button
-                                    size="sm"
-                                    className="ml-2 bg-transparent shadow-none p-0"
-                                    color=""
-                                    onClick={() => deleteParams(q.param)}
-                                >
-                                    <FontAwesomeIcon icon={faX} />
-                                </Button>
-                            </Badge>
-                        </p>
-                    )
-                }
+                {searchBadges.map((q, i) => (
+                    <p key={i} className="d-inline h5">
+                        <Badge
+                            color="light"
+                            className="mr-2 text-dark font-weight-normal p-2 my-1">
+                            <b>{q.name}</b>:&nbsp;
+                            {(s =>
+                                q.username
+                                    ? userList
+                                          .filter(u => u.uid === s)
+                                          .map(u => `${u.cn} (${u.uid})`)[0] ??
+                                      s
+                                    : s)(getParam(q.param))}
+                            <Button
+                                size="sm"
+                                className="ml-2 bg-transparent shadow-none p-0"
+                                color=""
+                                onClick={() => deleteParams(q.param)}>
+                                <FontAwesomeIcon icon={faX} />
+                            </Button>
+                        </Badge>
+                    </p>
+                ))}
             </span>
 
             <InfiniteScroll
                 dataLength={getQuotes().length}
                 next={fetchQuotes}
                 hasMore={isMore}
-                loader={<p className="text-center">Loading ...</p>}
-            >
+                loader={<p className="text-center">Loading ...</p>}>
                 <Container>
-
-                    {
-                        getQuotes().sort(sortQuotes).map((q, i) =>
-                            <QuoteCard key={i} quote={q} onVoteChange={voteChange(q)}>
-                                {
-                                    oidcUser.preferred_username === q.submitter.uid &&
-                                    <DropdownItem onClick={() => confirmDelete(q)} className="btn-danger shadow-none">
-                                        <FontAwesomeIcon icon={faTrash} className="mr-2" fixedWidth />
+                    {getQuotes()
+                        .sort(sortQuotes)
+                        .map((q, i) => (
+                            <QuoteCard
+                                key={i}
+                                quote={q}
+                                onVoteChange={voteChange(q)}>
+                                {oidcUser.preferred_username ===
+                                    q.submitter.uid && (
+                                    <DropdownItem
+                                        onClick={() => confirmDelete(q)}
+                                        className="btn-danger shadow-none">
+                                        <FontAwesomeIcon
+                                            icon={faTrash}
+                                            className="mr-2"
+                                            fixedWidth
+                                        />
                                         Delete
                                     </DropdownItem>
-                                }
+                                )}
 
-                                {
-                                    canHide(q) &&
-                                    <DropdownItem onClick={() => confirmHide(q)} className="btn-warning shadow-none">
-                                        <FontAwesomeIcon icon={faEyeSlash} className="mr-2" fixedWidth />
+                                {canHide(q) && (
+                                    <DropdownItem
+                                        onClick={() => confirmHide(q)}
+                                        className="btn-warning shadow-none">
+                                        <FontAwesomeIcon
+                                            icon={faEyeSlash}
+                                            className="mr-2"
+                                            fixedWidth
+                                        />
                                         Hide
                                     </DropdownItem>
-                                }
+                                )}
 
-                                {
-                                    props.storageType === "STORAGE" &&
-                                    <DropdownItem onClick={() => confirmReport(q)} className="btn-danger shadow-none">
-                                        <FontAwesomeIcon icon={faFlag} className="mr-2" fixedWidth />
+                                {props.storageType === "STORAGE" && (
+                                    <DropdownItem
+                                        onClick={() => confirmReport(q)}
+                                        className="btn-danger shadow-none">
+                                        <FontAwesomeIcon
+                                            icon={faFlag}
+                                            className="mr-2"
+                                            fixedWidth
+                                        />
                                         Report
                                     </DropdownItem>
-                                }
+                                )}
                             </QuoteCard>
-                        )
-                    }
+                        ))}
 
-                    {
-                        isMore &&
+                    {isMore && (
                         <div className="d-flex justify-content-center mb-3">
-                            <Button onClick={() => fetchQuotes()} className="btn-info">Load more</Button>
+                            <Button
+                                onClick={() => fetchQuotes()}
+                                className="btn-info">
+                                Load more
+                            </Button>
                         </div>
-                    }
-                    {canBeFunny() && <div className="text-center mb-3">How did you read ALL of the quotes lol</div>}
-                    {
-                        modalState &&
+                    )}
+                    {canBeFunny() && (
+                        <div className="text-center mb-3">
+                            How did you read ALL of the quotes lol
+                        </div>
+                    )}
+                    {modalState && (
                         <ConfirmModal
-                            onConfirm={() => modalState.confirmAction(modalState.quote)}
+                            onConfirm={() =>
+                                modalState.confirmAction(modalState.quote)
+                            }
                             isOpen={modalState.isOpen}
                             headerText={modalState.headerText}
-                            toggle={() => setModalState({ ...modalState, isOpen: !modalState.isOpen })}
+                            toggle={() =>
+                                setModalState({
+                                    ...modalState,
+                                    isOpen: !modalState.isOpen,
+                                })
+                            }
                             color={modalState.color}
-                            confirmText={modalState.confirmText}
-                        >
+                            confirmText={modalState.confirmText}>
                             <QuoteCard quote={modalState.quote} />
-                            {
-                                modalState.showReportInput &&
+                            {modalState.showReportInput && (
                                 <Input
                                     type="text"
                                     placeholder="Why do you want to report this Quote?"
                                     value={reportText}
-                                    onChange={e => setReportText(e.target.value)}
+                                    onChange={e =>
+                                        setReportText(e.target.value)
+                                    }
                                 />
-                            }
+                            )}
                         </ConfirmModal>
-                    }
+                    )}
                 </Container>
             </InfiniteScroll>
         </Container>
     )
 }
 
-export default Storage;
+export default Storage

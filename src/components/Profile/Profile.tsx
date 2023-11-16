@@ -1,11 +1,11 @@
-import { OidcUserStatus, useOidcUser } from "@axa-fr/react-oidc";
-import { DropdownToggle, UncontrolledDropdown } from "reactstrap";
+import { OidcUserStatus, useOidcUser } from "@axa-fr/react-oidc"
+import { DropdownToggle, UncontrolledDropdown } from "reactstrap"
 
 const Profile = () => {
-    const { oidcUser, oidcUserLoadingState } = useOidcUser();
+    const { oidcUser, oidcUserLoadingState } = useOidcUser()
 
     if (oidcUserLoadingState !== OidcUserStatus.Loaded) {
-        return (<></>);
+        return <></>
     }
 
     return (
@@ -20,11 +20,12 @@ const Profile = () => {
                     height={32}
                 />
 
-                <span className="ml-2">{oidcUser.name} ({oidcUser.preferred_username})</span>
-
+                <span className="ml-2">
+                    {oidcUser.name} ({oidcUser.preferred_username})
+                </span>
             </DropdownToggle>
         </UncontrolledDropdown>
     )
 }
 
-export default Profile;
+export default Profile

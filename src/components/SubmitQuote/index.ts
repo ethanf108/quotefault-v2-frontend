@@ -1,3 +1,3 @@
-import SubmitQuote from "./SubmitQuote";
+import SubmitQuote from "./SubmitQuote"
 
-export default SubmitQuote;
+export default SubmitQuote

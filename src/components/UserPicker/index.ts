@@ -1,3 +1,3 @@
-import UserPicker from "./UserPicker";
+import UserPicker from "./UserPicker"
 
-export default UserPicker;
+export default UserPicker

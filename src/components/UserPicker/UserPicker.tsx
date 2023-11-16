@@ -1,33 +1,37 @@
-import { useEffect, useId, useState } from "react";
-import { Input } from "reactstrap";
-import { CSHUser } from "../../API/Types";
+import { useEffect, useId, useState } from "react"
+import { Input } from "reactstrap"
+import { CSHUser } from "../../API/Types"
 
 export interface Props {
-    value: string,
-    onChange: (e: string) => void,
-    userList?: CSHUser[],
-    inputId?: string,
+    value: string
+    onChange: (e: string) => void
+    userList?: CSHUser[]
+    inputId?: string
 }
 
 const UserPicker = (props: Props) => {
+    const userListId = useId()
 
-    const userListId = useId();
+    const [users, setUsers] = useState<CSHUser[]>([])
 
-    const [users, setUsers] = useState<CSHUser[]>([]);
+    useEffect(() => setUsers(props.userList || []), [props.userList])
 
-    useEffect(() => setUsers(props.userList || []), [props.userList]);
-
-    const updateSearch = (e: React.ChangeEvent<HTMLInputElement>) => props.onChange(e.target.value)
+    const updateSearch = (e: React.ChangeEvent<HTMLInputElement>) =>
+        props.onChange(e.target.value)
 
     const getFilteredUsers = (query: string) => {
         if (!query) {
-            return [];
+            return []
         }
 
         return users
-            .filter(u => `${u.cn} ${u.uid}`.toLocaleLowerCase().includes(query.toLocaleLowerCase()))
+            .filter(u =>
+                `${u.cn} ${u.uid}`
+                    .toLocaleLowerCase()
+                    .includes(query.toLocaleLowerCase())
+            )
             .sort((a, b) => a.cn.localeCompare(b.cn))
-            .slice(0, 10);
+            .slice(0, 10)
     }
 
     return (
@@ -42,10 +46,12 @@ const UserPicker = (props: Props) => {
             />
 
             <datalist id={`userList-${userListId}`}>
-                {getFilteredUsers(props.value).map((u, i) => <option key={i} value={`${u.cn} (${u.uid})`} />)}
+                {getFilteredUsers(props.value).map((u, i) => (
+                    <option key={i} value={`${u.cn} (${u.uid})`} />
+                ))}
             </datalist>
         </>
     )
 }
 
-export default UserPicker;
+export default UserPicker

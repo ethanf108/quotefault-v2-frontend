@@ -1,3 +1,3 @@
-import Plug from "./Plug";
+import Plug from "./Plug"
 
-export default Plug;
+export default Plug

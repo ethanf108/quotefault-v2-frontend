@@ -1,7 +1,7 @@
-import { Card, Container } from "reactstrap";
-import Plug from "../../components/Plug";
-import SubmitQuote from "../../components/SubmitQuote";
-import GitFooter from "./GitFooter";
+import { Card, Container } from "reactstrap"
+import Plug from "../../components/Plug"
+import SubmitQuote from "../../components/SubmitQuote"
+import GitFooter from "./GitFooter"
 
 const Home = () => {
     return (
@@ -15,4 +15,4 @@ const Home = () => {
     )
 }
 
-export default Home;
+export default Home
