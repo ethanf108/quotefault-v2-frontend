@@ -1,0 +1,36 @@
+* Quotefault v2
+** What is Quotefault?
+[[https://quotefault.csh.rit.edu][Quotefault]] is a Quote Database for out-of-context quotes spoken by members of
+[[https://csh.rit.edu][Computer Science House]].
+** Why is v2?
+[[https://github.com/ComputerScienceHouse/Quotefault/][Original Quotefault]] was written by [[https://github.com/dantayy][user:dantayy]] in (supposedly) one weekend. It
+was a great piece of software, but it was decided that it must be rewritten to
+support a more modern client-server architecture, instead of the template format
+it used previously.
+** What is v2?
+Features added:
+1. Multi-user quotes
+2. Infinite scrolling (finally)
+3. Search
+4. More Search (!)
+5. Report reasons
+** How is Quotefault v2?
+*** Frontend
+The Quotefault frontend is a React web app using Typescript.
+Other technologies used:
+- ~vite~ :: Build system. Very fast :)
+- ~eslint~ :: Linter, used to make sure code is good quality
+- ~prettier~ :: Standardizes the code format
+- ~docker~ :: For deployment on CSH's Kubernetes cluster
+- ~nginx~ :: Used in the Docker build process, for VERY fast hosting
+
+*** Backend
+[[https://github.com/costowell/quotefault-backend][bye :)]]
+
+* Dev Setup
+1. Make sure you have ~npm~ installed
+2. Run ~npm ci~ to download dependancies
+   1. This should automatically configure the ~git~ hooks, but check your ~git~
+      config (~git config -l~) to make sure ~core.hookspath~ is set to
+      ~git-hooks~
+3. To run the app, run ~npm run dev~
