@@ -5,7 +5,8 @@ import { CSHUser } from "../../API/Types";
 export interface Props {
     value: string,
     onChange: (e: string) => void,
-    userList?: CSHUser[]
+    userList?: CSHUser[],
+    inputId?: string,
 }
 
 const UserPicker = (props: Props) => {
@@ -32,6 +33,7 @@ const UserPicker = (props: Props) => {
     return (
         <>
             <Input
+                id={props.inputId ?? ""}
                 type="text"
                 list={`userList-${userListId}`}
                 value={props.value}

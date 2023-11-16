@@ -8,6 +8,7 @@ import { useApi, useFetchArray } from "../../API/API";
 import { CSHUser } from "../../API/Types";
 import { toast } from "react-toastify";
 import { useOidcUser } from "@axa-fr/react-oidc";
+import { extractUsername } from "../../util";
 
 interface QuoteEntry {
     id: number,
@@ -60,26 +61,16 @@ const SubmitQuote = () => {
             }))
         );
 
-    const extractUsername = (q: QuoteEntry) => {
-        if (/^[a-zA-Z0-9]{2,32}$/.test(q.speaker)) {
-            return q.speaker;
-        } else if (/^.+\([a-zA-Z0-9]{2,32}\)$/.test(q.speaker)) {
-            return q.speaker.split(/\(|\)/)[1];
-        } else {
-            return "NONE!";
-        }
-    }
-
     const canSubmit = () => quoteEntries.every(q =>
         q.body.length > 0
-        && userList.map(u => u.uid.toLocaleLowerCase()).includes(extractUsername(q))
-        && oidcUser.preferred_username !== extractUsername(q));
+        && userList.map(u => u.uid.toLocaleLowerCase()).includes(extractUsername(q.speaker) ?? "NONE!")
+        && oidcUser.preferred_username !== extractUsername(q.speaker));
 
     const submit = () => {
         apiPost("/api/quote", {
             shards: quoteEntries.map(s => ({
                 body: s.body,
-                speaker: extractUsername(s),
+                speaker: extractUsername(s.speaker),
             }))
         })
             .then(() => {

@@ -1,16 +1,18 @@
 import { useEffect, useState } from "react";
-import { Quote, Vote } from "../../API/Types";
+import { CSHUser, Quote, Vote } from "../../API/Types";
 import InfiniteScroll from "react-infinite-scroll-component";
-import { toastError, useApi } from "../../API/API";
-import { Button, Card, CardBody, Container, DropdownItem, Input } from "reactstrap";
+import { toastError, useApi, useFetchArray } from "../../API/API";
 import { toast } from "react-toastify";
 import QuoteCard from "../../components/QuoteCard/QuoteCard";
 import { useOidcUser } from "@axa-fr/react-oidc";
 import ConfirmModal from "../../components/ConfirmModal"
 import { isEboardOrRTP } from "../../util";
-import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
-import { faMagnifyingGlass, faFlag, faEyeSlash, faTrash } from "@fortawesome/free-solid-svg-icons";
 import { useSearchParams } from "react-router-dom";
+import Search from "./Search";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { faEyeSlash, faFlag, faTrash, faX } from "@fortawesome/free-solid-svg-icons";
+import { deleteParams, searchParams } from ".";
+import { Badge, Button, Container, DropdownItem, Input } from "reactstrap";
 
 const pageSize = parseInt(process.env.QUOTEFAULT_STORAGE_PAGE_SIZE || "10");
 
@@ -36,19 +38,17 @@ const Storage = (props: Props) => {
 
     const [queryParams] = useSearchParams();
 
+    const getParam = (key: string): string | null => queryParams.has(key) ? queryParams.get(key) || null : null;
+
     const { apiGet, apiPut, apiDelete, apiPost } = useApi();
+
+    const userList = useFetchArray<CSHUser>("/api/users");
 
     const [quotes, setQuotes] = useState<QuoteDict>([]);
 
     const getQuotes = (q?: QuoteDict) => Object.values(q || quotes);
 
     const [isMore, setIsMore] = useState<boolean>(true);
-
-    //search = the actual contents of the teext box, searchQuery = after submit is pressed
-    const [search, setSearch] = useState<string>("");
-
-    const [searchQuery, setSearchQuery] = useState<string>("");
-
 
     const [modalState, setModalState] = useState<ModalProps | null>(null);
 
@@ -57,16 +57,13 @@ const Storage = (props: Props) => {
     const fetchQuotes = (quotes?: QuoteDict) => {
         if (!oidcUser) { return; }
 
-        const getVar = (name: string) => (queryParams.has(name) ? { [name]: queryParams.get(name) } : {});
+        const getVar = (name: string) => (getParam(name) ? { [name]: getParam(name) } : {});
 
         apiGet<Quote[]>("/api/quotes", {
             lt: getQuotes(quotes).reduce((a, b) => a.id < b.id && a.id != 0 ? a : b, { id: 0 }).id,
             limit: pageSize,
             ...(props.storageType !== "SELF" ? { hidden: props.storageType === "HIDDEN" } : { involved: oidcUser.preferred_username }),
-            ...getVar("involved"),
-            ...getVar("submitter"),
-            ...getVar("speaker"),
-            ...(search === "" ? {} : { q: search })
+            ...searchParams.map(s => getVar(s.param)).reduce((a, b) => ({ ...a, ...b }))
         })
             .then(q => {
                 if (q.length < pageSize) {
@@ -116,8 +113,8 @@ const Storage = (props: Props) => {
         apiPost(`/api/quote/${quote?.id}/report`, {
             reason: reportText
         })
-        .then(() => toast.success("Submitted report!", { theme: "colored" }))
-        .catch(toastError("Failed to submit report"));
+            .then(() => toast.success("Submitted report!", { theme: "colored" }))
+            .catch(toastError("Failed to submit report"));
 
     const confirmHide = (quote: Quote) => {
         setModalState({
@@ -167,51 +164,38 @@ const Storage = (props: Props) => {
         }
     }
 
-    useEffect(() => {
-        setQuotes([]);
-        setIsMore(true);
-        fetchQuotes({});
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [searchQuery]);
-
     const sortQuotes = (a: Quote, b: Quote) =>
         ((a, b) => b.getTime() - a.getTime())(new Date(a.timestamp), new Date(b.timestamp));
 
-    const canBeFunny = () => !isMore && searchQuery === "" && props.storageType === "STORAGE";
+    const canBeFunny = () => !isMore && !getParam("q") && props.storageType === "STORAGE";
 
-    const headerText = (() => {
-        let ret;
-        if (queryParams.has("involved")) {
-            ret = `Quotes from ${queryParams.get("involved")}`;
-        } else {
-            ret = (() => {
-                switch (props.storageType) {
-                    case "STORAGE":
-                        return "Storage"
-                    case "SELF":
-                        return "My Quotes"
-                    case "HIDDEN":
-                        return "Hidden Quotes 😳"
-                }
-            })()
-        }
-        if (searchQuery) {
-            return `Searching for "${searchQuery}" in ${ret}`;
-        }
-        return ret;
-    })();
+    const searchBadges = searchParams.filter(q => getParam(q.param));
 
     return (
-        <Container className="px-0">
-            <Card className="mx-3">
-                <CardBody className="d-flex py-1 px-1">
-                    <Input type="text" placeholder="Search" className="mx-2" value={search} onChange={e => setSearch(e.target.value)} />
-                    <Button className="btn-sm shadow-none btn-info d-flex align-items-center" onClick={() => setSearchQuery(search)}>
-                        <FontAwesomeIcon icon={faMagnifyingGlass} className="mr-2 py-0" />
-                        Search
-                    </Button>
-                </CardBody>
-            </Card>
+        <Container>
+
+            <Search userList={userList} />
+
+            <span className="d-flex my-3">
+                {
+                    searchBadges.map((q, i) =>
+                        <p key={i} className="d-inline h5">
+                            <Badge color="light" className="mr-2 text-dark font-weight-normal p-2 my-1">
+                                <b>{q.name}</b>:&nbsp;
+                                {(s => q.username ? userList.filter(u => u.uid === s).map(u => `${u.cn} (${u.uid})`)[0] ?? s : s)(getParam(q.param))}
+                                <Button
+                                    size="sm"
+                                    className="ml-2 bg-transparent shadow-none p-0"
+                                    color=""
+                                    onClick={() => deleteParams(q.param)}
+                                >
+                                    <FontAwesomeIcon icon={faX} />
+                                </Button>
+                            </Badge>
+                        </p>
+                    )
+                }
+            </span>
 
             <InfiniteScroll
                 dataLength={getQuotes().length}
@@ -221,48 +205,56 @@ const Storage = (props: Props) => {
             >
                 <Container>
 
-                    <h1 className="my-5">{headerText}</h1>
-
                     {
                         getQuotes().sort(sortQuotes).map((q, i) =>
                             <QuoteCard key={i} quote={q} onVoteChange={voteChange(q)}>
-                                {oidcUser.preferred_username === q.submitter.uid &&
+                                {
+                                    oidcUser.preferred_username === q.submitter.uid &&
                                     <DropdownItem onClick={() => confirmDelete(q)} className="btn-danger shadow-none">
-                                      <FontAwesomeIcon icon={faTrash} className="mr-2" fixedWidth/>
-                                      Delete
-                                    </DropdownItem>}
+                                        <FontAwesomeIcon icon={faTrash} className="mr-2" fixedWidth />
+                                        Delete
+                                    </DropdownItem>
+                                }
 
-                                {canHide(q)
-                                    &&
+                                {
+                                    canHide(q) &&
                                     <DropdownItem onClick={() => confirmHide(q)} className="btn-warning shadow-none">
-                                      <FontAwesomeIcon icon={faEyeSlash} className="mr-2" fixedWidth/>
-                                      Hide
-                                    </DropdownItem>}
+                                        <FontAwesomeIcon icon={faEyeSlash} className="mr-2" fixedWidth />
+                                        Hide
+                                    </DropdownItem>
+                                }
 
-                                {props.storageType === "STORAGE" &&
+                                {
+                                    props.storageType === "STORAGE" &&
                                     <DropdownItem onClick={() => confirmReport(q)} className="btn-danger shadow-none">
-                                      <FontAwesomeIcon icon={faFlag} className="mr-2" fixedWidth/>
-                                      Report
-                                    </DropdownItem>}
-                            </QuoteCard>)
+                                        <FontAwesomeIcon icon={faFlag} className="mr-2" fixedWidth />
+                                        Report
+                                    </DropdownItem>
+                                }
+                            </QuoteCard>
+                        )
                     }
+
                     {
-                        isMore && <div className="d-flex justify-content-center mb-3">
+                        isMore &&
+                        <div className="d-flex justify-content-center mb-3">
                             <Button onClick={() => fetchQuotes()} className="btn-info">Load more</Button>
                         </div>
                     }
                     {canBeFunny() && <div className="text-center mb-3">How did you read ALL of the quotes lol</div>}
-                    { modalState &&
+                    {
+                        modalState &&
                         <ConfirmModal
                             onConfirm={() => modalState.confirmAction(modalState.quote)}
                             isOpen={modalState.isOpen}
                             headerText={modalState.headerText}
-                            toggle={() => setModalState({...modalState, isOpen: !modalState.isOpen})}
+                            toggle={() => setModalState({ ...modalState, isOpen: !modalState.isOpen })}
                             color={modalState.color}
                             confirmText={modalState.confirmText}
                         >
-                            <QuoteCard quote={modalState.quote}/>
-                            { modalState.showReportInput &&
+                            <QuoteCard quote={modalState.quote} />
+                            {
+                                modalState.showReportInput &&
                                 <Input
                                     type="text"
                                     placeholder="Why do you want to report this Quote?"
