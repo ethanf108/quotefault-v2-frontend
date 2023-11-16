@@ -101,7 +101,7 @@ const QuoteCard = (props: Props) => {
                             <b>{formatUser(props.quote.submitter)}</b>
                         </a>
                         &nbsp; on{" "}
-                        {new Date(props.quote.timestamp)
+                        {new Date(props.quote.timestamp + "Z")
                             .toLocaleString()
                             .replace(", ", " at ")}
                     </p>

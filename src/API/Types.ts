@@ -16,7 +16,7 @@ export interface Quote {
     id: number
     shards: QuoteShard[]
     submitter: CSHUser
-    timestamp: Date
+    timestamp: string
     score: number
     vote: Vote
     hidden: boolean | null
@@ -27,7 +27,7 @@ export interface Report {
     reports: [
         {
             reason: string
-            timestamp: Date
+            timestamp: string
         },
     ]
 }

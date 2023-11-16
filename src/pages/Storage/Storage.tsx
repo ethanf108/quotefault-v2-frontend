@@ -189,8 +189,8 @@ const Storage = (props: Props) => {
 
     const sortQuotes = (a: Quote, b: Quote) =>
         ((a, b) => b.getTime() - a.getTime())(
-            new Date(a.timestamp),
-            new Date(b.timestamp)
+            new Date(a.timestamp + "Z"),
+            new Date(b.timestamp + "Z")
         )
 
     const canBeFunny = () =>

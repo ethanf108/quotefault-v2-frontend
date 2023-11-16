@@ -46,8 +46,8 @@ const Reports = () => {
 
     const sortQuotes = (a: ReportData, b: ReportData) =>
         ((a, b) => a.getTime() - b.getTime())(
-            new Date(a.quote!.timestamp),
-            new Date(b.quote!.timestamp)
+            new Date(a.quote!.timestamp + "Z"),
+            new Date(b.quote!.timestamp + "Z")
         )
 
     const resolve = (report: ReportData, action: "HIDE" | "IGNORE") => {
