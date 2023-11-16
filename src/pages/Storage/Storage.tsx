@@ -194,7 +194,9 @@ const Storage = (props: Props) => {
         )
 
     const canBeFunny = () =>
-        !isMore && !getParam("q") && props.storageType === "STORAGE"
+        !isMore &&
+        searchParams.every(p => !getParam(p.param)) &&
+        props.storageType === "STORAGE"
 
     const searchBadges = searchParams.filter(q => getParam(q.param))
 
