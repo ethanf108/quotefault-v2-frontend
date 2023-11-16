@@ -39,7 +39,9 @@ const QuoteCard = (props: Props) => {
     }, [props.quote])
 
     return (
-        <Card className="mb-3">
+        <Card
+            className={`mb-3 ${props.quote.hidden && "border-warning"}`}
+            style={props.quote.hidden ? { borderWidth: "5px" } : {}}>
             <CardBody className="d-flex pr-2">
                 <span className="float-left flex-grow-1">
                     {props.quote.shards.map((s, i) => (
