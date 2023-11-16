@@ -37,6 +37,8 @@ interface ModalProps {
 
 type QuoteDict = { [key: number]: Quote }
 
+let LMAO_FUCK_ME = ""
+
 const Storage = (props: Props) => {
     const { oidcUser } = useOidcUser()
 
@@ -130,7 +132,7 @@ const Storage = (props: Props) => {
 
     const reportQuote = (quote: Quote) =>
         apiPost(`/api/quote/${quote?.id}/report`, {
-            reason: reportText,
+            reason: LMAO_FUCK_ME,
         })
             .then(() =>
                 toast.success("Submitted report!", { theme: "colored" })
@@ -324,9 +326,10 @@ const Storage = (props: Props) => {
                                     type="text"
                                     placeholder="Why do you want to report this Quote?"
                                     value={reportText}
-                                    onChange={e =>
+                                    onChange={e => {
                                         setReportText(e.target.value)
-                                    }
+                                        LMAO_FUCK_ME = e.target.value
+                                    }}
                                 />
                             )}
                         </ConfirmModal>
