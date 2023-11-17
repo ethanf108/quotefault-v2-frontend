@@ -15,25 +15,33 @@ const GitFooter = () => {
 
     return (
         <div className="mt-3 text-center">
-            <p className="text-monospace d-inline mx-2">
-                <a
-                    href={`${frontendGitCommitURL}/tree/${frontendGitCommitHash}`}
-                    rel="noopener"
-                    target="_blank">
-                    <FontAwesomeIcon icon={faCodeBranch} />
-                    <span className="mx-1">Frontend</span>
-                    <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
-                </a>
-            </p>
+            {!frontendGitCommitURL.startsWith("%") && (
+                <p>
+                    <a
+                        href={`${frontendGitCommitURL}/tree/${frontendGitCommitHash}`}
+                        rel="noopener"
+                        target="_blank">
+                        <FontAwesomeIcon icon={faCodeBranch} className="mr-1" />
+                        Frontend
+                        <span className="text-monospace mx-1">
+                            ({frontendGitCommitHash.substring(0, 7)})
+                        </span>
+                        <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
+                    </a>
+                </p>
+            )}
 
             {backendGit && (
-                <p className="text-monospace d-inline mx-2">
+                <p>
                     <a
                         href={`${backendGit.url}/tree/${backendGit.revision}`}
                         rel="noopener"
                         target="_blank">
-                        <FontAwesomeIcon icon={faCodeBranch} />
-                        <span className="mx-1">Backend</span>
+                        <FontAwesomeIcon icon={faCodeBranch} className="mr-1" />
+                        Backend
+                        <span className="text-monospace mx-1">
+                            ({backendGit.revision.substring(0, 7)})
+                        </span>
                         <FontAwesomeIcon icon={faArrowUpRightFromSquare} />
                     </a>
                 </p>
