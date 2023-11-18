@@ -46,7 +46,7 @@ const QuoteCard = (props: Props) => {
                 <span className="float-left flex-grow-1">
                     {props.quote.shards.map((s, i) => (
                         <p key={i}>
-                            &quot;{s.body}&quot; - &nbsp;
+                            {s.body} - &nbsp;
                             <a
                                 href={`/personal?involved=${s.speaker.uid}`}
                                 className="text-primary">
