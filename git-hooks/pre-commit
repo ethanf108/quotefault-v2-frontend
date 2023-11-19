@@ -4,9 +4,9 @@
 
 HEADER="\e[1;37m[Quotefault \e[1;32mpre-commit\e[1;37m]\e[0m"
 
-FILES=$(git diff --name-only --cached --diff-filter=AM | grep -E "\\.tsx?$") # List of files that are staged to be committed
+FILES=$(git diff --name-only --cached --diff-filter=AM | grep -E "\\.tsx?$" | tr '\n' ' ') # List of files that are staged to be committed
 
-[ -z $FILES ] && echo -e $HEADER No .ts or .tsx files found, skipping checks ... && exit 0
+[ -z "$FILES" ] && echo -e $HEADER No .ts or .tsx files found, skipping checks ... && exit 0
 
 # Check if the files are formatted correctly
 npx prettier --config .prettierrc $FILES --check || exit -1

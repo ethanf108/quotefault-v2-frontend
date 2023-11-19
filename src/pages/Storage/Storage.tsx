@@ -22,7 +22,7 @@ import { Badge, Button, Container, DropdownItem, Input } from "reactstrap"
 const pageSize = parseInt(process.env.QUOTEFAULT_STORAGE_PAGE_SIZE || "10")
 
 interface Props {
-    storageType: "STORAGE" | "HIDDEN" | "PERSONAL"
+    storageType: "STORAGE" | "HIDDEN" | "PERSONAL" | "FAVORITES"
 }
 
 interface ModalProps {
@@ -61,6 +61,10 @@ const Storage = (props: Props) => {
 
     const [reportText, setReportText] = useState<string>("")
 
+    if (props.storageType === "PERSONAL" && getParam("involved")) {
+        window.location.assign(`/storage?involved=${getParam("involved")}`)
+    }
+
     const fetchQuotes = (quotes?: QuoteDict) => {
         if (!oidcUser) {
             return
@@ -69,18 +73,29 @@ const Storage = (props: Props) => {
         const getVar = (name: string) =>
             getParam(name) ? { [name]: getParam(name) } : {}
 
+        const storageTypeParams = (() => {
+            switch (props.storageType) {
+                case "STORAGE":
+                    return {}
+                case "HIDDEN":
+                    return { hidden: true }
+                case "PERSONAL":
+                    return { involved: oidcUser.preferred_username }
+                case "FAVORITES":
+                    return { favorited: true }
+            }
+        })()
+
         apiGet<Quote[]>("/api/quotes", {
             lt: getQuotes(quotes).reduce(
                 (a, b) => (a.id < b.id && a.id != 0 ? a : b),
                 { id: 0 }
             ).id,
             limit: pageSize,
-            ...(props.storageType !== "PERSONAL"
-                ? { hidden: props.storageType === "HIDDEN" }
-                : { involved: oidcUser.preferred_username }),
             ...searchParams
                 .map(s => getVar(s.param))
                 .reduce((a, b) => ({ ...a, ...b })),
+            ...storageTypeParams,
         })
             .then(q => {
                 if (q.length < pageSize) {
@@ -189,6 +204,24 @@ const Storage = (props: Props) => {
         }
     }
 
+    const favoriteChange = (quote: Quote) => (favorite: boolean) => {
+        if (favorite) {
+            apiPost(`/api/quote/${quote.id}/favorite`)
+                .then(() => updateQuote(quote.id))
+                .catch(toastError("Failed to favorite quote"))
+        } else {
+            apiDelete(`/api/quote/${quote.id}/favorite`)
+                .then(
+                    () =>
+                        props.storageType === "FAVORITES" &&
+                        setQuotes(quotes =>
+                            getQuotes(quotes).filter(q => q.id !== quote.id)
+                        )
+                )
+                .catch(toastError("Failed to un-favorite quote"))
+        }
+    }
+
     const sortQuotes = (a: Quote, b: Quote) =>
         ((a, b) => b.getTime() - a.getTime())(
             new Date(a.timestamp + "Z"),
@@ -248,7 +281,8 @@ const Storage = (props: Props) => {
                             <QuoteCard
                                 key={i}
                                 quote={q}
-                                onVoteChange={voteChange(q)}>
+                                onVoteChange={voteChange(q)}
+                                onFavorite={favoriteChange(q)}>
                                 {oidcUser.preferred_username ===
                                     q.submitter.uid && (
                                     <DropdownItem

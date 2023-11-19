@@ -35,6 +35,10 @@ function App() {
                             path="/personal"
                             element={<Storage storageType="PERSONAL" />}
                         />
+                        <Route
+                            path="/favorites"
+                            element={<Storage storageType="FAVORITES" />}
+                        />
                         <Route path="/report" element={<SubmitReport />} />
                         <Route path="/reports" element={<Reports />} />
                     </Routes>
