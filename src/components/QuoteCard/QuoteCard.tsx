@@ -1,4 +1,5 @@
 import {
+    Button,
     Card,
     CardBody,
     CardFooter,
@@ -14,12 +15,15 @@ import {
     faSquareCaretDown,
     faSquareCaretUp,
     faEllipsis,
+    faStar,
 } from "@fortawesome/free-solid-svg-icons"
 import { ReactNode, useEffect, useState } from "react"
+import { assignParams } from "../../pages/Storage"
 
 interface Props {
     quote: Quote
     onVoteChange?: (type: Vote) => void
+    onFavorite?: (favorite: boolean) => void
     children?: ReactNode
 }
 
@@ -48,7 +52,10 @@ const QuoteCard = (props: Props) => {
                         <p key={i}>
                             {s.body} - &nbsp;
                             <a
-                                href={`/personal?involved=${s.speaker.uid}`}
+                                onClick={() =>
+                                    assignParams({ involved: s.speaker.uid })
+                                }
+                                href="#"
                                 className="text-primary">
                                 <b>{formatUser(s.speaker)}</b>
                             </a>
@@ -96,7 +103,12 @@ const QuoteCard = (props: Props) => {
                     <p className="float-left flex-grow-1">
                         Submitted By &nbsp;
                         <a
-                            href={`/personal?involved=${props.quote.submitter.uid}`}
+                            onClick={() =>
+                                assignParams({
+                                    involved: props.quote.submitter.uid,
+                                })
+                            }
+                            href="#"
                             className="text-primary">
                             <b>{formatUser(props.quote.submitter)}</b>
                         </a>
@@ -105,6 +117,21 @@ const QuoteCard = (props: Props) => {
                             .toLocaleString()
                             .replace(", ", " at ")}
                     </p>
+
+                    {props.onFavorite && (
+                        <Button
+                            className="shadow-none"
+                            style={{
+                                background: props.quote.favorited
+                                    ? "gold"
+                                    : "none",
+                            }}
+                            onClick={() =>
+                                props.onFavorite!(!props.quote.favorited)
+                            }>
+                            <FontAwesomeIcon icon={faStar} />
+                        </Button>
+                    )}
 
                     {props.children && (
                         <Dropdown

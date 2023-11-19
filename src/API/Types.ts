@@ -20,6 +20,7 @@ export interface Quote {
     score: number
     vote: Vote
     hidden: boolean | null
+    favorited: boolean
 }
 
 export interface Report {

@@ -13,6 +13,7 @@ import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import {
     faDatabase,
     faFlag,
+    faStar,
     faUser,
     faWarning,
 } from "@fortawesome/free-solid-svg-icons"
@@ -44,6 +45,7 @@ const NavBar = () => {
                                 Storage
                             </NavLink>
                         </NavItem>
+
                         <NavItem>
                             <NavLink href="/personal">
                                 <FontAwesomeIcon
@@ -51,6 +53,16 @@ const NavBar = () => {
                                     className="mr-1"
                                 />
                                 Personal
+                            </NavLink>
+                        </NavItem>
+
+                        <NavItem>
+                            <NavLink href="/favorites">
+                                <FontAwesomeIcon
+                                    icon={faStar}
+                                    className="mr-1"
+                                />
+                                Favorites
                             </NavLink>
                         </NavItem>
                         {isEboardOrRTP(oidcUser) && (
