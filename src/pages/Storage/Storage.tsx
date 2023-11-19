@@ -312,7 +312,7 @@ const Storage = (props: Props) => {
                                     </DropdownItem>
                                 )}
 
-                                {props.storageType === "STORAGE" && (
+                                {props.storageType !== "HIDDEN" && (
                                     <DropdownItem
                                         onClick={() => confirmReport(q)}
                                         className="btn-danger shadow-none">
