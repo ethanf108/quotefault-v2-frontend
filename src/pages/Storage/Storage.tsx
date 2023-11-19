@@ -211,13 +211,15 @@ const Storage = (props: Props) => {
                 .catch(toastError("Failed to favorite quote"))
         } else {
             apiDelete(`/api/quote/${quote.id}/favorite`)
-                .then(
-                    () =>
-                        props.storageType === "FAVORITES" &&
+                .then(() => {
+                    if (props.storageType === "FAVORITES") {
                         setQuotes(quotes =>
                             getQuotes(quotes).filter(q => q.id !== quote.id)
                         )
-                )
+                    } else {
+                        updateQuote(quote.id)
+                    }
+                })
                 .catch(toastError("Failed to un-favorite quote"))
         }
     }
