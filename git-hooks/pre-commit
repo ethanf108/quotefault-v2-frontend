@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env bash
 
 # Checks to run before comit
 
@@ -9,9 +9,9 @@ FILES=$(git diff --name-only --cached --diff-filter=AM | grep -E "\\.tsx?$" | tr
 [ -z "$FILES" ] && echo -e $HEADER No .ts or .tsx files found, skipping checks ... && exit 0
 
 # Check if the files are formatted correctly
-npx prettier --config .prettierrc $FILES --check || exit -1
+npx prettier --config .prettierrc $FILES --check || exit 1
 
 # Run the linter on all files
-npx eslint $FILES --ext ts,tsx --report-unused-disable-directives --max-warnings 0 || exit -1
+npx eslint $FILES --ext ts,tsx --report-unused-disable-directives --max-warnings 0 || exit 1
 
 echo -e $HEADER All files passed!
