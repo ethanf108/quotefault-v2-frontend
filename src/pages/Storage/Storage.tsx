@@ -76,7 +76,7 @@ const Storage = (props: Props) => {
         const storageTypeParams = (() => {
             switch (props.storageType) {
                 case "STORAGE":
-                    return {}
+                    return { hidden: false }
                 case "HIDDEN":
                     return { hidden: true }
                 case "PERSONAL":
