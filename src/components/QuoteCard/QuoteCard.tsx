@@ -20,7 +20,7 @@ import {
 import { ReactNode, useEffect, useState } from "react"
 import { assignParams } from "../../pages/Storage"
 
-interface Props {
+type Props = {
     quote: Quote
     onVoteChange?: (type: Vote) => void
     onFavorite?: (favorite: boolean) => void
@@ -41,6 +41,24 @@ const QuoteCard = (props: Props) => {
     useEffect(() => {
         setVote(props.quote.vote)
     }, [props.quote])
+
+    const hidden = props.quote.hidden
+    const hiddenByContent = hidden && (
+        <p>
+            Hidden by&nbsp;
+            <a
+                onClick={() =>
+                    assignParams({
+                        involved: hidden.actor.uid,
+                    })
+                }
+                href="#"
+                className="text-primary">
+                <b>{formatUser(hidden.actor)}</b>
+            </a>
+            . Reason: {hidden.reason}
+        </p>
+    )
 
     return (
         <Card
@@ -100,23 +118,28 @@ const QuoteCard = (props: Props) => {
             </CardBody>
             <CardFooter>
                 <div className="d-flex">
-                    <p className="float-left flex-grow-1">
-                        Submitted By &nbsp;
-                        <a
-                            onClick={() =>
-                                assignParams({
-                                    involved: props.quote.submitter.uid,
-                                })
-                            }
-                            href="#"
-                            className="text-primary">
-                            <b>{formatUser(props.quote.submitter)}</b>
-                        </a>
-                        &nbsp; on{" "}
-                        {new Date(props.quote.timestamp + "Z")
-                            .toLocaleString()
-                            .replace(", ", " at ")}
-                    </p>
+                    <div className="d-flex flex-row float-left flex-grow-1">
+                        <div className="d-flex flex-column float-left flex-grow-1">
+                            <p>
+                                Submitted By&nbsp;
+                                <a
+                                    onClick={() =>
+                                        assignParams({
+                                            involved: props.quote.submitter.uid,
+                                        })
+                                    }
+                                    href="#"
+                                    className="text-primary">
+                                    <b>{formatUser(props.quote.submitter)}</b>
+                                </a>
+                                &nbsp;on{" "}
+                                {new Date(props.quote.timestamp + "Z")
+                                    .toLocaleString()
+                                    .replace(", ", " at ")}
+                            </p>
+                            {hiddenByContent}
+                        </div>
+                    </div>
 
                     {props.onFavorite && (
                         <Button
@@ -137,7 +160,7 @@ const QuoteCard = (props: Props) => {
                         <Dropdown
                             isOpen={dropdownOpen}
                             toggle={toggleDropdownOpen}
-                            className="float-right">
+                            className="float-right d-flex">
                             <DropdownToggle
                                 className="shadow-none"
                                 style={{ background: "none" }}>

@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react"
+import { useConstCallback } from "powerhooks"
 import { CSHUser, Quote, Vote } from "../../API/Types"
 import InfiniteScroll from "react-infinite-scroll-component"
 import { toastError, useApi, useFetchArray } from "../../API/API"
@@ -32,12 +33,10 @@ interface ModalProps {
     color: string
     headerText: string
     confirmText: string
-    showReportInput?: boolean
+    inputPlaceholder?: string
 }
 
 type QuoteDict = { [key: number]: Quote }
-
-let LMAO_FUCK_ME = ""
 
 const Storage = (props: Props) => {
     const { oidcUser } = useOidcUser()
@@ -138,21 +137,22 @@ const Storage = (props: Props) => {
         setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id))
     }
 
-    const hideQuote = (quote: Quote) => {
-        apiPut(`/api/quote/${quote.id}/hide`)
+    const hideQuote = useConstCallback((quote: Quote) => {
+        apiPut(`/api/quote/${quote.id}/hide`, { reason: reportText })
             .then(() => setQuotes(getQuotes().filter(q => q.id !== quote.id)))
             .catch(toastError("Failed to hide quote"))
         setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id))
-    }
+    })
 
-    const reportQuote = (quote: Quote) =>
+    const reportQuote = useConstCallback((quote: Quote) =>
         apiPost(`/api/quote/${quote?.id}/report`, {
-            reason: LMAO_FUCK_ME,
+            reason: reportText,
         })
             .then(() =>
                 toast.success("Submitted report!", { theme: "colored" })
             )
             .catch(toastError("Failed to submit report"))
+    )
 
     const confirmHide = (quote: Quote) => {
         setModalState({
@@ -162,6 +162,7 @@ const Storage = (props: Props) => {
             headerText: "Are you sure you want to hide this quote?",
             quote: quote,
             confirmAction: hideQuote,
+            inputPlaceholder: "Why do you want to hide this quote?",
         })
     }
     const confirmDelete = (quote: Quote) => {
@@ -179,10 +180,10 @@ const Storage = (props: Props) => {
             confirmText: "Report",
             color: "primary",
             isOpen: true,
-            headerText: "Why do you want to report this Quote?",
+            headerText: "Why do you want to report this quote?",
             quote: quote,
             confirmAction: reportQuote,
-            showReportInput: true,
+            inputPlaceholder: "Why do you want to report this quote?",
         })
     }
 
@@ -357,14 +358,13 @@ const Storage = (props: Props) => {
                             color={modalState.color}
                             confirmText={modalState.confirmText}>
                             <QuoteCard quote={modalState.quote} />
-                            {modalState.showReportInput && (
+                            {modalState.inputPlaceholder && (
                                 <Input
                                     type="text"
-                                    placeholder="Why do you want to report this Quote?"
+                                    placeholder={modalState.inputPlaceholder}
                                     value={reportText}
                                     onChange={e => {
                                         setReportText(e.target.value)
-                                        LMAO_FUCK_ME = e.target.value
                                     }}
                                 />
                             )}

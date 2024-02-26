@@ -12,15 +12,18 @@ export interface QuoteShard {
 
 export type Vote = "upvote" | "downvote" | null
 
-export interface Quote {
+export type Quote = {
     id: number
     shards: QuoteShard[]
     submitter: CSHUser
     timestamp: string
     score: number
     vote: Vote
-    hidden: boolean | null
     favorited: boolean
+    hidden: {
+        actor: CSHUser
+        reason: string
+    } | null
 }
 
 export interface Report {
