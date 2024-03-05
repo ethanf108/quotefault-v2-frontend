@@ -12,7 +12,7 @@ export interface QuoteShard {
 
 export type Vote = "upvote" | "downvote" | null
 
-export type Quote = {
+export interface Quote {
     id: number
     shards: QuoteShard[]
     submitter: CSHUser

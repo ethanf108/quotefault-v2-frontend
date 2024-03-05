@@ -20,7 +20,7 @@ import {
 import { ReactNode, useEffect, useState } from "react"
 import { assignParams } from "../../pages/Storage"
 
-type Props = {
+interface Props {
     quote: Quote
     onVoteChange?: (type: Vote) => void
     onFavorite?: (favorite: boolean) => void
