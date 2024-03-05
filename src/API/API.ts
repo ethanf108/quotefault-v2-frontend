@@ -2,9 +2,7 @@ import { useOidcFetch } from "@axa-fr/react-oidc"
 import { useEffect, useState } from "react"
 import { toast } from "react-toastify"
 
-export const baseURL: string = `${window.location.protocol}//${
-    window.location.hostname
-}${window.location.port ? `:${window.location.port}` : ""}`
+export const baseURL: string = process.env.API_BASE_URL || ""
 
 type FetchFunc = (
     input: RequestInfo | URL,
