@@ -132,16 +132,22 @@ const Storage = (props: Props) => {
     const deleteQuote = (quote: Quote) => {
         apiDelete(`/api/quote/${quote.id}`)
             .then(() => toast.success("Deleted Quote!", { theme: "colored" }))
-            .then(() => setQuotes(getQuotes().filter(q => q.id !== quote.id)))
+            .then(() =>
+                setQuotes(quotes =>
+                    getQuotes(quotes).filter(q => q.id !== quote.id)
+                )
+            )
             .catch(toastError("Failed to delete quote"))
-        setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id))
     }
 
     const hideQuote = useConstCallback((quote: Quote) => {
         apiPut(`/api/quote/${quote.id}/hide`, { reason: reportText })
-            .then(() => setQuotes(getQuotes().filter(q => q.id !== quote.id)))
+            .then(() =>
+                setQuotes(quotes =>
+                    getQuotes(quotes).filter(q => q.id !== quote.id)
+                )
+            )
             .catch(toastError("Failed to hide quote"))
-        setQuotes(quotes => getQuotes(quotes).filter(q => q.id !== quote.id))
     })
 
     const reportQuote = useConstCallback((quote: Quote) =>
